@@ -11,10 +11,20 @@
   body { display:flex; align-items:center; justify-content:center;
     font-family: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace; color:#fff; }
   canvas { display:block; }
+  .hud { position:fixed; top:8px; z-index:10; height:34px; padding:0 12px;
+    background:rgba(255,255,255,0.06); color:#fff;
+    border:1px solid rgba(255,255,255,0.25); border-radius:9px;
+    font-family:inherit; font-size:12px; letter-spacing:0.5px; cursor:pointer;
+    display:flex; align-items:center; -webkit-tap-highlight-color:transparent; }
+  .hud:active { background:rgba(255,255,255,0.18); }
+  #btnYeni { right:calc(50% + 5px); }
+  #btnTam  { left:calc(50% + 5px); }
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
+<button id="btnYeni" class="hud">&#8635; BA&#350;TAN</button>
+<button id="btnTam" class="hud">&#9214; TAM EKRAN</button>
 <script>
 "use strict";
 
@@ -38,7 +48,7 @@ addEventListener("resize", resize);
 const yerel = (cx, cy) => ({ x:(cx-offX)/scale, y:(cy-offY)/scale });
 
 /* ===================== YUKSELTMELER ===================== */
-const TEMEL = { yakit:110, itki:230, donme:3.0, inHiz:62, inAci:0.42, tuketim:26 };
+const TEMEL = { yakit:110, itki:230, donme:3.0, inHiz:62, inAci:0.60, tuketim:26 };
 const GRAV = 5600;
 
 const YUKSELTMELER = [
@@ -260,6 +270,19 @@ const birak = e => isaretler.delete(e.pointerId);
 cvs.addEventListener("pointerup", birak);
 cvs.addEventListener("pointercancel", birak);
 cvs.addEventListener("pointerleave", birak);
+
+/* Tam ekran ve Bastan butonlari (tablet icin) */
+document.getElementById("btnTam").addEventListener("click", () => {
+  const el = document.documentElement;
+  if (document.fullscreenElement || document.webkitFullscreenElement) {
+    (document.exitFullscreen || document.webkitExitFullscreen || (()=>{})).call(document);
+  } else {
+    (el.requestFullscreen || el.webkitRequestFullscreen || (()=>{})).call(el);
+  }
+});
+document.getElementById("btnYeni").addEventListener("click", () => {
+  if (durum !== "dukkan") { toplamDeneme++; anlikYukle(); }
+});
 
 let kolGecmis = { a:false, b:false, yukari:false, asagi:false, start:false };
 function kolOku() {
@@ -742,7 +765,8 @@ function arayuz() {
 
   if (durum === "hazir") {
     const s = ["Mavi gezegenden kalk, yesil gezegene in. Her inis bir sonrakinin kalkis noktasi.",
-               "Kol: sol cubuk don, A itki, B fuze  ·  Klavye: oklar, X  ·  Kolsuz: alttaki tuslar"];
+               "Klavye: OK tuslari = don/itki  ·  X = FUZE AT  ·  Kol: A itki, B fuze",
+               "Dokunmatik: alttaki tuslar  ·  Fuze icin once TERSANE'den FUZE RAMPASI al"];
     if (bedavaIkmal) s.push("", "Acil yakit ikmali yapildi (45)");
     kutu(etap === 1 ? "YOLCULUK BASLIYOR" : `${etap}. SICRAMA`, s, "DOKUN / ENTER");
   } else if (durum === "patladi") {
