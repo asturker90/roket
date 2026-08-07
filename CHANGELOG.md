@@ -3,6 +3,19 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada tutulur.
 Sürümleme kabaca [SemVer](https://semver.org/lang/tr/) mantığını izler.
 
+## [v1.5] — 2026-08-07
+
+### Eklendi
+- **Uydu (kontrol noktası)**: Tersane'den alınan sarf malzemesi (en fazla 3).
+  Uçarken bir tuşla (C / ekran tuşu / kol Y) bırakılır; o anki dünya + roket durumu
+  kaydedilir. Ölünce oyuncu sıçramanın başına değil, uydunun bırakıldığı yerden
+  (durgun, kontrol hemen elde) devam eder. Uydu o sıçrama boyunca geçerlidir;
+  başarılı iniş veya "BAŞTAN" ile iptal olur.
+  - Bırakılan uydu dünyada mavi bir işaretle görünür; HUD "UYDU n · NOKTA AKTIF"
+    gösterir; ekran tuşu ve kol (Y/üçgen) desteği eklendi.
+  - Anlık görüntü sistemi ortak `anlikGoruntu()` / `anlikGeriYukle()` fonksiyonlarına
+    çıkarıldı; hem etap-başı hem uydu diriliş bu ortak yolu kullanır.
+
 ## [v1.4] — 2026-08-07
 
 ### Eklendi

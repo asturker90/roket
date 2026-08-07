@@ -1,6 +1,6 @@
 # ROKET
 
-**Sürüm: v1.3** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md).
+**Sürüm: v1.5** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md).
 
 Yerçekimi tabanlı bir uzay yolculuğu oyunu. Tek HTML dosyası, bağımlılık yok, çevrimdışı çalışır.
 
@@ -49,9 +49,15 @@ Hedefe yaklaşınca bir rehber açılır ve düzgün inip inmediğini anında g�
 
 ## Tersane
 
-Her inişten sonra açılır. Altı yükseltme ve iki sarf malzemesi var.
+Her inişten sonra açılır. Altı yükseltme ve üç sarf malzemesi var.
 
 **Motor** itkiyi %14 artırır ama yakıt tüketimini %20 artırır — net kazanç değil, bir tercih. **Füze rampası** kapasiteyi 2 artırır ve dolu gelir. **Kalkan** her seviyede bir yük ekler; her sıçrama başında dolar ve bir göktaşı ya da kara delik çarpmasını emerek seni kurtarır (kara delikte acil fırlatma yapar). İniş hatalarını engellemez — beceri hâlâ sende.
+
+## Uydu (kontrol noktası)
+
+Ölünce oyun sıfırlanmaz — o sıçramanın başına dönersin, paran ve yükseltmelerin durur. Uzun sıçramalarda baştan başlamak yorucu olabilir; **uydu** bunun için var.
+
+Tersane'den satın aldığın bir sarf malzemesidir (en fazla 3 taşırsın). Uçarken istediğin anda bir tuşla bırakırsın; o anki durum kaydedilir. **Ölürsen sıçramanın başına değil, uydunun olduğu yerden devam edersin.** Zor bir geçitten hemen önce bırakmak en mantıklısı. Bıraktığın uydu o sıçrama boyunca geçerlidir; başarıyla inince ya da **BAŞTAN** dersen iptal olur.
 
 ## Kontroller
 
@@ -60,6 +66,7 @@ Her inişten sonra açılır. Altı yükseltme ve iki sarf malzemesi var.
 | Dönüş | Sol çubuk / D-pad | ← → veya A D | Sol alttaki tuşlar |
 | İtki | A veya RT | ↑ veya W veya Boşluk | Sağ alttaki ▲ |
 | Füze | B | X | Sağ alttaki FÜZE |
+| Uydu bırak | Y / Üçgen | C | Sağ alttaki UYDU |
 | Onay | A | Enter | Ekrana dokun |
 | Yeniden dene | — | R | — |
 
