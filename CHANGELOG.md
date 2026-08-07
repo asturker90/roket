@@ -3,6 +3,19 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada tutulur.
 Sürümleme kabaca [SemVer](https://semver.org/lang/tr/) mantığını izler.
 
+## [v1.4] — 2026-08-07
+
+### Eklendi
+- **İniş rehberi**: Hedefe yaklaşınca (yüzeye ~300 m kala) açılan görsel kılavuz.
+  Oyuncuların "ekranda dik" ile "yüzeye dik"i karıştırmasından kaynaklanan haksız
+  "EĞİK İNİŞ" sorununu giderir.
+  - Hedef yüzeyinde kabul açısı konisi + ideal yön (yüzey normali) kesikli çizgisi.
+  - Roket etrafında durum ışığı: kırmızı (eğik) → sarı (düz ama hızlı) → yeşil
+    (düz + yavaş, inişe hazır).
+  - HUD'da "ACI ✓ DUZ / ✗ EGIK" göstergesi.
+  - `hedefHizalama()` yardımcı fonksiyonu hem rehberi hem HUD'u besler; iniş kabul
+    mantığıyla (açı + hız eşikleri) birebir aynı hesabı kullanır.
+
 ## [v1.3] — 2026-08-07
 
 ### Eklendi
