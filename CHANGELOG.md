@@ -3,6 +3,20 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada tutulur.
 Sürümleme kabaca [SemVer](https://semver.org/lang/tr/) mantığını izler.
 
+## [v1.2] — 2026-08-07
+
+### Eklendi
+- **Kalkan yükseltmesi** (Tersane): Her seviye bir kalkan yükü verir (en fazla 3),
+  yükler her sıçrama başında dolar. Bir göktaşı çarpmasını ya da kara delik olay
+  ufkunu emerek roketi kurtarır — kara delikte roketi etki alanının dışına
+  fırlatır. İniş hatalarını (sert/eğik iniş) engellemez. Roket etrafında mavi
+  koruyucu halka ve HUD göstergesiyle gösterilir.
+
+### Düzeltildi / İyileştirildi
+- **Sürüm bilgisi görünürlüğü**: Sürüm artık tek kaynaktan (`SURUM` sabiti)
+  tarayıcı sekme başlığına ve her ekranın (uçuş + tersane) köşesine yansıyor;
+  köşe etiketi daha okunur hale getirildi.
+
 ## [v1.1] — 2026-08-07
 
 Yeni oynanış içeriği eklendi.
