@@ -1,6 +1,6 @@
 # ROKET
 
-**Sürüm: v1.8** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md).
+**Sürüm: v1.9** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md).
 
 Yerçekimi tabanlı bir uzay yolculuğu oyunu. Tek HTML dosyası, bağımlılık yok, çevrimdışı çalışır.
 
@@ -57,6 +57,12 @@ Bazı sıçramalarda yolun üstünde **sarı bir gezegen** çıkar; üzerinde sa
 4. Sonra oradan kalkıp kendi hedefine devam edersin — yani tek durak değil, çift duraklı bir yolculuk.
 
 Yakıtından verdiğin için bu bir tercih: yolun uzar, yakıtın azalır, ama ödül büyüktür.
+
+## UFO (20. sıçramadan sonra)
+
+20. sıçramayı geçtikten sonra her sıçramada bir **düşman UFO** belirir. Haritaya **rastgele bir kenardan, rastgele bir zamanda** girer — nereden geleceğini bilemezsin. Görünür alanı çaprazlarken sana doğru **toplam 3 füze** atar (pembe oklar). Füzeye değersen ölürsün; **kalkanın** varsa emer.
+
+Bir uyarı ("UFO YAKLASIYOR") gelir. İki seçeneğin var: **kaç** (füzeleri savuştur), ya da **kendi füzenle UFO'yu vur** — vurursan patlar ve **+150 kredi** verir.
 
 ## Tersane
 
