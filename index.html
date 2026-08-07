@@ -30,7 +30,7 @@
 
 /* ===================== EKRAN ===================== */
 const W = 1200, H = 800;
-const SURUM = "v1.5";
+const SURUM = "v1.6";
 document.title = `ROKET ${SURUM} — YOLCULUK`;
 const cvs = document.getElementById("c");
 const ctx = cvs.getContext("2d");
@@ -266,11 +266,11 @@ const dunyaBitir = () => ctx.restore();
 
 /* ===================== EKRAN TUSLARI ===================== */
 const TUSLAR = [
-  { id:"sol",  x:105,   y:H-95,  r:52, etiket:"\u25C0" },
-  { id:"sag",  x:225,   y:H-95,  r:52, etiket:"\u25B6" },
-  { id:"uydu", x:W-360, y:H-95,  r:44, etiket:"UYDU" },
-  { id:"ates", x:W-235, y:H-95,  r:48, etiket:"FUZE" },
-  { id:"itki", x:W-105, y:H-100, r:60, etiket:"\u25B2" }
+  { id:"sol",  x:105,   y:H-95,  r:52, etiket:"\u25C0",    tus:"A" },
+  { id:"sag",  x:225,   y:H-95,  r:52, etiket:"\u25B6",    tus:"D" },
+  { id:"uydu", x:W-360, y:H-95,  r:44, etiket:"UYDU", tus:"C" },
+  { id:"ates", x:W-235, y:H-95,  r:48, etiket:"FUZE", tus:"X" },
+  { id:"itki", x:W-105, y:H-100, r:60, etiket:"\u25B2",    tus:"W" }
 ];
 
 /* ===================== GIRDI ===================== */
@@ -886,7 +886,12 @@ function ekranTuslariCiz() {
     ctx.textAlign = "center"; ctx.textBaseline = "middle";
     ctx.font = t.etiket.length > 2 ? "13px ui-monospace, monospace" : "20px ui-monospace, monospace";
     const etiket = t.id === "ates" ? `FUZE ${fuzeSayi}` : (t.id === "uydu" ? `UYDU ${uyduSayi}` : t.etiket);
-    ctx.fillText(etiket, t.x, t.y+1);
+    ctx.fillText(etiket, t.x, t.tus ? t.y-8 : t.y+1);   // tus varsa etiketi yukari al
+    if (t.tus) {   // klavye tusunu butonun altina yaz (yonerge okumadan gorunsun)
+      ctx.font = "11px ui-monospace, monospace";
+      ctx.fillStyle = pasif ? "rgba(255,255,255,0.2)" : (on ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.45)");
+      ctx.fillText(`(${t.tus})`, t.x, t.y+13);
+    }
   }
   ctx.textBaseline = "alphabetic"; ctx.textAlign = "left";
 }

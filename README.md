@@ -1,6 +1,6 @@
 # ROKET
 
-**Sürüm: v1.5** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md).
+**Sürüm: v1.6** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md).
 
 Yerçekimi tabanlı bir uzay yolculuğu oyunu. Tek HTML dosyası, bağımlılık yok, çevrimdışı çalışır.
 
@@ -69,6 +69,8 @@ Tersane'den satın aldığın bir sarf malzemesidir (en fazla 3 taşırsın). U�
 | Uydu bırak | Y / Üçgen | C | Sağ alttaki UYDU |
 | Onay | A | Enter | Ekrana dokun |
 | Yeniden dene | — | R | — |
+
+Her dokunmatik tuşun altında karşılık gelen klavye tuşu yazılıdır — ◀ (A), ▶ (D), ▲ (W), FÜZE (X), UYDU (C) — böylece yönergeleri okumadan da hangi tuşun ne yaptığı görünür.
 
 Kol bağlandığında ekran tuşları otomatik kaybolur.
 
