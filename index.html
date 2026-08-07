@@ -30,7 +30,7 @@
 
 /* ===================== EKRAN ===================== */
 const W = 1200, H = 800;
-const SURUM = "v1.8";
+const SURUM = "v1.9";
 document.title = `ROKET ${SURUM} — YOLCULUK`;
 const cvs = document.getElementById("c");
 const ctx = cvs.getContext("2d");
@@ -87,6 +87,7 @@ const SARFLAR = [
 /* ===================== DUNYA ===================== */
 let gezegenler = [], taslar = [], parcalar = [], iz = [], fuzeler = [];
 let karaDelikler = [], kapsuller = [], gidenMekikler = [];
+let ufo = null, ufoTimer = -1, dusmanFuzeler = [];   // 20. etap sonrasi dusman UFO
 let bildirim = null;
 let roket, yakit = 0, fuzeSayi = 0, kalkan = 0, para = 0;
 let etap = 1, durum = "hazir", mesaj = null, sure = 0, toplamDeneme = 0;
@@ -222,6 +223,8 @@ function anlikGeriYukle(k, uyduMu) {
   roket = { ...k.roket };
   yakit = k.yakit; fuzeSayi = k.fuzeSayi; kalkan = k.kalkan; para = k.para; yon = k.yon;
   parcalar = []; iz = []; fuzeler = []; gidenMekikler = []; bildirim = null;
+  ufo = null; dusmanFuzeler = [];
+  ufoTimer = etap >= 20 ? 2.5 + Math.random()*4.5 : -1;   // dirilince UFO yeniden gelir
   atisSayac = 0; sarsinti = 0; mesaj = null;
   if (uyduMu) {   // uydudan diril: yerinde, durgun, hemen kontrol sende
     roket.vx = roket.vy = 0; roket.canli = true; durum = "ucus"; sure = k.sure;
@@ -252,6 +255,8 @@ function etapBaslat() {
   anlikKaydet();
   sure = 0; durum = "hazir"; mesaj = null;
   parcalar = []; iz = []; fuzeler = []; gidenMekikler = []; bildirim = null;
+  ufo = null; dusmanFuzeler = [];
+  ufoTimer = etap >= 20 ? 2.5 + Math.random()*4.5 : -1;   // 20. etaptan sonra UFO gelir
 }
 
 function yenidenBasla() {
@@ -259,6 +264,7 @@ function yenidenBasla() {
   para = 0; etap = 1; toplamDeneme = 0; sonKazanc = null;
   yakit = kapasite(); fuzeSayi = 0; kalkan = 0; yon = -0.35;
   uyduSayi = 0; uyduKayit = null; uyduKonum = null;
+  ufo = null; ufoTimer = -1; dusmanFuzeler = [];
   sonrakiId = 1; gezegenler = []; taslar = []; karaDelikler = []; kapsuller = []; gidenMekikler = []; bildirim = null;
 
   const ilk = gezegenYap(0, 0, 92, 1.2);
@@ -520,6 +526,21 @@ function mekikKurtar(p) {   // mekigin yakiti doldu: kalkip gider, bol para bira
   sarsinti = Math.max(sarsinti, 6);
 }
 
+function ufoCagir() {   // rastgele bir kenardan girer, haritayi caprazlar, 3 fuze atar
+  const h = hedefGez(), b = basGez();
+  const cx = ((h?h.x:roket.x) + (b?b.x:roket.x)) / 2;
+  const cy = ((h?h.y:roket.y) + (b?b.y:roket.y)) / 2;
+  const a = Math.random()*6.2832;                 // giris yonu (rastgele — nereden gelecegi belli olmaz)
+  const R = 950, perp = a + Math.PI/2, off = (Math.random()-0.5)*360;   // gorunur alandan gecsin
+  const hiz = 160;
+  ufo = { x: cx + Math.cos(a)*R + Math.cos(perp)*off,
+          y: cy + Math.sin(a)*R + Math.sin(perp)*off,
+          vx: -Math.cos(a)*hiz, vy: -Math.sin(a)*hiz,
+          atisKalan: 3, atisSayac: 2.4 + Math.random()*0.8, faz: 0, omur: (2*R)/hiz + 1 };
+  bildirim = { metin:"! UFO YAKLASIYOR !", omur:2.2 };
+  sarsinti = Math.max(sarsinti, 4);
+}
+
 /* ===================== FIZIK ===================== */
 function guncelle(dt) {
   const pad = kolOku();
@@ -543,6 +564,27 @@ function guncelle(dt) {
         omur:0.3+Math.random()*0.2, renk:"#fff" });
   }
   gidenMekikler = gidenMekikler.filter(m => m.omur > 0);
+
+  // UFO: zamani gelince cagir, hareket ettir, rokete 3 fuze at
+  if (durum === "ucus" && ufoTimer > 0) { ufoTimer -= dt; if (ufoTimer <= 0 && !ufo) ufoCagir(); }
+  if (ufo) {
+    ufo.x += ufo.vx*dt; ufo.y += ufo.vy*dt; ufo.omur -= dt; ufo.faz += dt*5;
+    ufo.atisSayac -= dt;
+    if (ufo.atisKalan > 0 && ufo.atisSayac <= 0 && durum === "ucus" && roket.canli) {
+      ufo.atisKalan--; ufo.atisSayac = 0.95;
+      const dx = roket.x-ufo.x, dy = roket.y-ufo.y, d = Math.hypot(dx,dy)||1;
+      dusmanFuzeler.push({ x:ufo.x, y:ufo.y, vx:(dx/d)*265, vy:(dy/d)*265, omur:5 });
+      sarsinti = Math.max(sarsinti, 3);
+    }
+    if (ufo.omur <= 0) ufo = null;
+  }
+  for (const m of dusmanFuzeler) {
+    m.x += m.vx*dt; m.y += m.vy*dt; m.omur -= dt;
+    if (Math.random() < 0.5)
+      parcalar.push({ x:m.x, y:m.y, vx:(Math.random()-0.5)*30, vy:(Math.random()-0.5)*30,
+        omur:0.3+Math.random()*0.15, renk:"#ff5c8a" });
+  }
+  dusmanFuzeler = dusmanFuzeler.filter(m => m.omur > 0);
 
   for (const p of gezegenler) {
     p.x += p.vx*dt; p.y += p.vy*dt;
@@ -587,6 +629,15 @@ function guncelle(dt) {
       }
     }
     if (m.omur <= 0) continue;
+    if (ufo) {   // kendi fuzenle UFO'yu vurursan yok olur, para verir
+      const dx = ufo.x-m.x, dy = ufo.y-m.y;
+      if (dx*dx+dy*dy < 24*24) {
+        m.omur = 0; para += 150;
+        patlamaEfekti(ufo.x, ufo.y, 50, "#ff5c8a", 280);
+        bildirim = { metin:"UFO VURULDU   +150 KREDI", omur:2.2 };
+        sarsinti = Math.max(sarsinti, 9); ufo = null; continue;
+      }
+    }
     for (const p of gezegenler) {
       const dx = p.x-m.x, dy = p.y-m.y;
       if (dx*dx+dy*dy < (p.r+4)*(p.r+4)) { m.omur = 0; fuzeCarpti(m, p); break; }
@@ -665,6 +716,15 @@ function guncelle(dt) {
       bitir(false, "GOKTASI"); return;
     }
   }
+
+  for (const m of dusmanFuzeler) {   // UFO fuzesi
+    const dx = m.x-roket.x, dy = m.y-roket.y;
+    if (dx*dx+dy*dy < (12+11)*(12+11)) {
+      if (kalkan > 0) { kalkan--; m.omur = 0; kalkanKir(m.x, m.y); continue; }
+      bitir(false, "UFO FUZESI"); return;
+    }
+  }
+  dusmanFuzeler = dusmanFuzeler.filter(m => m.omur > 0);
 
   for (const k of kapsuller) {
     if (!k.canli) continue;
@@ -872,6 +932,21 @@ function karaDelikCiz(k) {
   ctx.shadowBlur = 0;
 }
 
+function ufoCiz(u) {
+  ctx.save(); ctx.translate(u.x, u.y);
+  ctx.shadowColor = "#ff5c8a"; ctx.shadowBlur = 14;
+  ctx.strokeStyle = "#ff5c8a"; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.ellipse(0, 2, 27, 9, 0, 0, 6.2832); ctx.stroke();   // govde
+  ctx.beginPath(); ctx.arc(0, -1, 12, Math.PI, 0); ctx.stroke();            // kubbe
+  ctx.beginPath(); ctx.moveTo(-27, 2); ctx.lineTo(27, 2); ctx.stroke();
+  ctx.shadowBlur = 8; ctx.fillStyle = "#ff5c8a";                            // yanip sonen isiklar
+  for (let i = -2; i <= 2; i++) {
+    ctx.globalAlpha = Math.sin(u.faz + i*1.1) > 0 ? 1 : 0.25;
+    ctx.beginPath(); ctx.arc(i*10, 8, 2.2, 0, 6.2832); ctx.fill();
+  }
+  ctx.globalAlpha = 1; ctx.restore();
+}
+
 function kapsulCiz(k) {
   const t = performance.now()/1000;
   const renk = k.tur === "yakit" ? "#7cf5c0" : "#f5d97c";
@@ -1049,6 +1124,15 @@ function ciz() {
     ctx.restore();
   }
 
+  ctx.shadowColor = "#ff5c8a"; ctx.shadowBlur = 12;   // UFO fuzeleri (dusman)
+  ctx.strokeStyle = "#ff5c8a"; ctx.lineWidth = 2;
+  for (const m of dusmanFuzeler) {
+    ctx.save(); ctx.translate(m.x, m.y); ctx.rotate(Math.atan2(m.vy, m.vx));
+    ctx.beginPath(); ctx.moveTo(8,0); ctx.lineTo(-6,4); ctx.lineTo(-6,-4); ctx.closePath(); ctx.stroke();
+    ctx.restore();
+  }
+  if (ufo) ufoCiz(ufo);
+
   ctx.shadowBlur = 5;
   for (const p of parcalar) {
     ctx.globalAlpha = Math.max(0, Math.min(1, p.omur*2));
@@ -1127,6 +1211,7 @@ function arayuz() {
     if (kapsuller.length)    s.push("Kapsulleri topla — F: +yakit, $: +kredi");
     if (karaDelikler.length) s.push("Kara delige dikkat: cekimi guclu, olay ufku olduruyor");
     if (gezegenler.some(g=>g.kurtarma)) s.push("Sari gezegende mahsur mekik var — duzgun in, yakit ver, kurtar, bol para al");
+    if (etap >= 20)          s.push("UFO tehlikesi: haritada belirir, 3 fuze atar — kacin ya da fuzeyle vur (+150)");
     if (uyduSayi > 0)        s.push("UYDU birak (C / ekran tusu): olursen oradan devam edersin");
     if (bedavaIkmal)         s.push("Acil yakit ikmali yapildi (45)");
     kutu(etap === 1 ? "YOLCULUK BASLIYOR" : `${etap}. SICRAMA`, s, "DOKUN / ENTER");

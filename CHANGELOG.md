@@ -3,6 +3,19 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada tutulur.
 Sürümleme kabaca [SemVer](https://semver.org/lang/tr/) mantığını izler.
 
+## [v1.9] — 2026-08-07
+
+### Eklendi
+- **Düşman UFO (20. sıçrama sonrası)**: 20. sıçramayı geçince her sıçramada bir UFO
+  belirir. Haritaya rastgele bir kenardan, rastgele bir zamanda girer (nereden
+  geleceği belli olmaz), görünür alanı çaprazlar ve rokete doğru **toplam 3 füze**
+  atar (pembe, ölümcül; kalkan emer). "UFO YAKLASIYOR" uyarısı gelir.
+  - Oyuncu kendi füzesiyle UFO'yu vurabilir → patlar, +150 kredi.
+  - İlk atış UFO görünür alana girene kadar geciktirilir; yörünge oyun alanından
+    geçecek şekilde ayarlandı (füzeler ekran dışından sürpriz gelmez).
+  - Düşman UFO ve füzeleri anlık görüntüye dahil değil; ölünce/dirilince UFO
+    yeniden gelir.
+
 ## [v1.8] — 2026-08-07
 
 ### Düzeltildi
