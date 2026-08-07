@@ -8,7 +8,7 @@ Bir gezegenden kalkıp bir sonrakine iniyorsun. İndiğin gezegen, bir sonraki s
 
 ## Oynanış
 
-- **Yeşil** gezegene yavaş ve dik inmen gerekiyor. Hem hız hem açı tutmalı.
+- **Yeşil** gezegene yavaş ve dik inmen gerekiyor. Hem hız hem açı tutmalı. Dikkat: "dik" ekrana göre değil, **gezegen yüzeyine** göredir — yani roketin burnu, indiğin noktada gezegenin merkezinden dışa doğru bakmalı. Hedefe yaklaşınca açılan **iniş rehberi** bunu gösterir (aşağıya bak).
 - **Mavi** gezegen geldiğin yer. Üzerinde durabilirsin ama hızlı çarparsan ölürsün.
 - **Beyaz** gezegenler yolun üstündeki kütleler. Yörüngeni büker; tuzak da olabilir, hızlanma fırsatı da.
 - **Mor** girdap bir kara deliktir. Çekimi bir gezegeninkinden çok daha güçlü — yörüngeni sertçe büker. Olay ufkuna girersen seni yutar ve sıçramayı kaybedersin. Ustalıkla kullanırsan sapan etkisiyle hızlanmanın da yoludur. 4. sıçramadan sonra çıkmaya başlar.
@@ -38,6 +38,14 @@ Başarılı her inişten sabit bir sıçrama ödülü alırsın. Bunun üstüne 
 - **Süre bonusu** — sıçramayı ne kadar hızlı tamamlarsan.
 
 İniş sonrası ekranda her kalemin katkısı ve yüzden ("% yavaş", "% dik") gösterilir. Kusursuz bir iniş, ödülü kabaca iki katına çıkarabilir — yani hem inmek hem de *iyi* inmek para eder.
+
+## İniş rehberi
+
+Hedefe yaklaşınca bir rehber açılır ve düzgün inip inmediğini anında gösterir:
+
+- Yüzeyde bir **kılavuz koni** belirir; ortadaki kesikli çizgi doğru "yukarı" (yüzey normali) yönünü, iki kenar da kabul edilen açı aralığını gösterir. Roketin burnunu bu koninin içine getir.
+- Roketin etrafındaki **durum ışığı** renk değiştirir: **kırmızı** = eğiksin, **sarı** = açı düz ama çok hızlısın (yavaşla), **yeşil** = düz ve yeterince yavaş, inebilirsin.
+- Sağ üstte **AÇI ✓ DÜZ / ✗ EĞİK** göstergesi aynı bilgiyi metin olarak verir.
 
 ## Tersane
 

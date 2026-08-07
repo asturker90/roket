@@ -30,7 +30,7 @@
 
 /* ===================== EKRAN ===================== */
 const W = 1200, H = 800;
-const SURUM = "v1.3";
+const SURUM = "v1.4";
 document.title = `ROKET ${SURUM} — YOLCULUK`;
 const cvs = document.getElementById("c");
 const ctx = cvs.getContext("2d");
@@ -787,6 +787,46 @@ function kalkanCiz(x, y) {
   ctx.restore();
 }
 
+/* Hedefe gore hizalama durumu — hem rehber hem HUD kullanir */
+function hedefHizalama() {
+  const h = hedefGez();
+  if (!h) return null;
+  const dx = roket.x-h.x, dy = roket.y-h.y, d = Math.hypot(dx,dy) || 1;
+  const nAci = Math.atan2(dx, -dy);
+  const fark = Math.abs(((roket.aci-nAci+Math.PI*3)%(Math.PI*2))-Math.PI);
+  const hiz = Math.hypot(roket.vx-h.vx, roket.vy-h.vy);
+  return { h, d, nx:dx/d, ny:dy/d, nAci, fark, hiz,
+           yaklasma: d-h.r, aciTamam: fark<inisAcisi(), hizTamam: hiz<inisHizi() };
+}
+
+/* Inis rehberi — hedefe yaklasinca dogru acyi ve durumu gosterir */
+function inisRehberi() {
+  const z = hedefHizalama();
+  if (!z || z.yaklasma > 300) return;
+  const sx = z.h.x + z.nx*z.h.r, sy = z.h.y + z.ny*z.h.r;   // yuzeydeki inis noktasi
+  const renk = z.aciTamam ? (z.hizTamam ? "#7cf5c0" : "#f5d97c") : "#ff5c4d";
+  const yog = Math.max(0.3, 1 - z.yaklasma/300);
+  const uzun = 62;
+
+  ctx.save();
+  ctx.globalAlpha = yog; ctx.shadowColor = renk; ctx.shadowBlur = 8;
+  // kabul konisi: iki sinir acisi (roket burnu bu aralikta olmali)
+  ctx.strokeStyle = renk; ctx.lineWidth = 1.6/kam.s;
+  for (const s of [-1, 1]) {
+    const a = z.nAci + s*inisAcisi();
+    ctx.beginPath(); ctx.moveTo(sx, sy);
+    ctx.lineTo(sx + Math.sin(a)*uzun, sy - Math.cos(a)*uzun); ctx.stroke();
+  }
+  // ideal "yukari" (yuzey normali) — kesikli orta cizgi
+  ctx.setLineDash([5/kam.s, 5/kam.s]); ctx.lineWidth = 1.2/kam.s;
+  ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(sx+z.nx*uzun, sy+z.ny*uzun); ctx.stroke();
+  ctx.setLineDash([]);
+  // roket etrafinda durum isigi
+  ctx.shadowBlur = 14; ctx.lineWidth = 2.6/kam.s;
+  ctx.beginPath(); ctx.arc(roket.x, roket.y, 27, 0, 6.2832); ctx.stroke();
+  ctx.restore();
+}
+
 function ekranTuslariCiz() {
   if (kolBagli) return;
   const basili = new Set();
@@ -870,6 +910,7 @@ function ciz() {
     ctx.fillRect(p.x-1.4, p.y-1.4, 2.8, 2.8);
   }
   ctx.globalAlpha = 1;
+  if (durum === "ucus") inisRehberi();
   if ((roket.canli || durum === "indi") && kalkan > 0) kalkanCiz(roket.x, roket.y);
   if (roket.canli || durum === "indi") roketCiz(roket.x, roket.y, roket.aci, roket.itki, roket.ayak);
   dunyaBitir();
@@ -905,6 +946,15 @@ function arayuz() {
   ctx.font = "13px ui-monospace, monospace";
   ctx.fillStyle = hiz < inisHizi() ? "#7cf5c0" : "#ff5c4d";
   ctx.fillText(`HIZ ${hiz.toFixed(0).padStart(3," ")} / ${inisHizi().toFixed(0)}`, W-20, 68);
+  // hedefe yaklasinca aci (diklik) gostergesi
+  if (durum === "ucus") {
+    const z = hedefHizalama();
+    if (z && z.yaklasma < 300) {
+      ctx.textAlign = "right"; ctx.font = "13px ui-monospace, monospace";
+      ctx.fillStyle = z.aciTamam ? "#7cf5c0" : "#ff5c4d";
+      ctx.fillText(z.aciTamam ? "ACI ✓ DUZ" : "ACI ✗ EGIK", W-20, 90);
+    }
+  }
   ctx.textAlign = "left";
 
   if (durum === "hazir") {
