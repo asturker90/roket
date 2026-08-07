@@ -1,6 +1,6 @@
 # ROKET
 
-**Sürüm: v1.1** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md).
+**Sürüm: v1.2** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md).
 
 Yerçekimi tabanlı bir uzay yolculuğu oyunu. Tek HTML dosyası, bağımlılık yok, çevrimdışı çalışır.
 
@@ -31,9 +31,9 @@ Hedef gezegeni tamamen yok edersen sıçramayı kaybedersin.
 
 ## Tersane
 
-Her inişten sonra açılır. Beş yükseltme ve iki sarf malzemesi var.
+Her inişten sonra açılır. Altı yükseltme ve iki sarf malzemesi var.
 
-**Motor** itkiyi %14 artırır ama yakıt tüketimini %20 artırır — net kazanç değil, bir tercih. **Füze rampası** kapasiteyi 2 artırır ve dolu gelir.
+**Motor** itkiyi %14 artırır ama yakıt tüketimini %20 artırır — net kazanç değil, bir tercih. **Füze rampası** kapasiteyi 2 artırır ve dolu gelir. **Kalkan** her seviyede bir yük ekler; her sıçrama başında dolar ve bir göktaşı ya da kara delik çarpmasını emerek seni kurtarır (kara delikte acil fırlatma yapar). İniş hatalarını engellemez — beceri hâlâ sende.
 
 ## Kontroller
 
