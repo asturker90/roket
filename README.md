@@ -1,6 +1,6 @@
 # ROKET
 
-**Sürüm: v1.2** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md).
+**Sürüm: v1.3** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md).
 
 Yerçekimi tabanlı bir uzay yolculuğu oyunu. Tek HTML dosyası, bağımlılık yok, çevrimdışı çalışır.
 
@@ -28,6 +28,16 @@ Gezegenin boyutuna göre farklı davranır:
 Kırıntılar tehlikeli göktaşına dönüşür — patlatmak bedava değil. Kraterler kalıcıdır ve gezegenle birlikte yolculuğa devam eder.
 
 Hedef gezegeni tamamen yok edersen sıçramayı kaybedersin.
+
+## Kredi ve iniş kalitesi
+
+Başarılı her inişten sabit bir sıçrama ödülü alırsın. Bunun üstüne inişinin kalitesi kadar bonus eklenir:
+
+- **Yumuşak iniş** — hedefe ne kadar yavaş dokunursan (iniş hızı sıfıra ne kadar yakınsa) o kadar çok kredi.
+- **Dik iniş** — ne kadar dik (yüzeye ne kadar dik açıyla) inersen o kadar çok kredi.
+- **Süre bonusu** — sıçramayı ne kadar hızlı tamamlarsan.
+
+İniş sonrası ekranda her kalemin katkısı ve yüzden ("% yavaş", "% dik") gösterilir. Kusursuz bir iniş, ödülü kabaca iki katına çıkarabilir — yani hem inmek hem de *iyi* inmek para eder.
 
 ## Tersane
 

@@ -30,7 +30,7 @@
 
 /* ===================== EKRAN ===================== */
 const W = 1200, H = 800;
-const SURUM = "v1.2";
+const SURUM = "v1.3";
 document.title = `ROKET ${SURUM} — YOLCULUK`;
 const cvs = document.getElementById("c");
 const ctx = cvs.getContext("2d");
@@ -603,7 +603,7 @@ function guncelle(dt) {
         roket.y = p.y + ny*(p.r+AYAK_BOY);
         roket.vx = roket.vy = 0; roket.aci = nAci; roket.ayak = 1;
         sonInisId = p.id;
-        bitir(true, "INIS BASARILI");
+        bitir(true, "INIS BASARILI", { hiz, fark });
         return;
       }
 
@@ -629,16 +629,23 @@ function guncelle(dt) {
   }
 }
 
-function bitir(basarili, metin) {
+function bitir(basarili, metin, kalite) {
   if (durum !== "ucus") return;
   roket.canli = basarili;
   durum = basarili ? "indi" : "patladi";
   mesaj = metin;
   if (basarili) {
     const temel = 180 + etap*45;
-    const hizBonus = Math.max(0, Math.round(90 - sure*3));
-    sonKazanc = { temel, hizBonus, toplam: temel+hizBonus };
-    para += sonKazanc.toplam;
+    const sureBonus = Math.max(0, Math.round(90 - sure*3));
+    // inis kalitesi: ne kadar yavas ve ne kadar dik inersen o kadar cok kredi
+    const hizOran = kalite ? Math.max(0, 1 - kalite.hiz/inisHizi())  : 0;  // 0=sinirda, 1=tam durgun
+    const aciOran = kalite ? Math.max(0, 1 - kalite.fark/inisAcisi()) : 0;  // 0=sinirda, 1=tam dik
+    const yumusak = Math.round(hizOran * 150);
+    const dik     = Math.round(aciOran * 120);
+    const toplam = temel + yumusak + dik + sureBonus;
+    sonKazanc = { temel, yumusak, dik, sureBonus, toplam,
+                  hizYuzde: Math.round(hizOran*100), dikYuzde: Math.round(aciOran*100) };
+    para += toplam;
   } else { patlamaEfekti(roket.x, roket.y, 42, "#fff", 250); sarsinti = 13; }
 }
 
@@ -912,10 +919,12 @@ function arayuz() {
     kutu(mesaj, [`Sure ${sure.toFixed(1)} sn`, "Sicrama basina donuluyor"], "TEKRAR ICIN DOKUN", "#ff5c4d");
   } else if (durum === "indi") {
     kutu(mesaj, [
-      `Sicrama odulu  ${sonKazanc.temel}`,
-      `Hiz bonusu     ${sonKazanc.hizBonus}`,
-      `TOPLAM         ${sonKazanc.toplam} KREDI`,
-      `Kalan yakit    ${yakit.toFixed(0)}`
+      `Sicrama odulu   ${sonKazanc.temel}`,
+      `Yumusak inis    +${sonKazanc.yumusak}   (%${sonKazanc.hizYuzde} yavas)`,
+      `Dik inis        +${sonKazanc.dik}   (%${sonKazanc.dikYuzde} dik)`,
+      `Sure bonusu     +${sonKazanc.sureBonus}`,
+      `TOPLAM          ${sonKazanc.toplam} KREDI`,
+      `Kalan yakit     ${yakit.toFixed(0)}`
     ], "TERSANEYE GEC", "#7cf5c0");
   }
 }
@@ -934,6 +943,9 @@ function kutu(baslik, satirlar, alt, renk) {
   satirlar.forEach((s,i) => ctx.fillText(s, W/2, H/2-22+i*21));
   ctx.fillStyle = "#6a6a6a"; ctx.font = "12px ui-monospace, monospace";
   ctx.fillText(alt, W/2, H/2+104);
+  // surum etiketi — modal kosesinde, kacirilmasi zor
+  ctx.textAlign = "right"; ctx.font = "12px ui-monospace, monospace";
+  ctx.fillStyle = "rgba(255,255,255,0.5)"; ctx.fillText(`ROKET ${SURUM}`, W-24, H/2+114);
   ctx.textAlign = "left";
 }
 
@@ -942,6 +954,8 @@ function dukkanCiz() {
   ctx.shadowColor = "#f5d97c"; ctx.shadowBlur = 16; ctx.fillStyle = "#f5d97c";
   ctx.font = "700 36px ui-monospace, monospace"; ctx.fillText("TERSANE", W/2, 104);
   ctx.shadowBlur = 0;
+  ctx.font = "12px ui-monospace, monospace"; ctx.fillStyle = "rgba(245,217,124,0.6)";
+  ctx.fillText(`ROKET ${SURUM}`, W/2, 62);
   ctx.font = "16px ui-monospace, monospace"; ctx.fillStyle = "#fff";
   ctx.fillText(`${para} KREDI   ·   YAKIT ${yakit.toFixed(0)}/${kapasite()}` +
     (seviye.fuze ? `   ·   FUZE ${fuzeSayi}/${fuzeKap()}` : ""), W/2, 140);
