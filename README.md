@@ -1,6 +1,6 @@
 # ROKET
 
-**Sürüm: v1.7** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md).
+**Sürüm: v1.8** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md).
 
 Yerçekimi tabanlı bir uzay yolculuğu oyunu. Tek HTML dosyası, bağımlılık yok, çevrimdışı çalışır.
 
@@ -11,7 +11,7 @@ Bir gezegenden kalkıp bir sonrakine iniyorsun. İndiğin gezegen, bir sonraki s
 - **Yeşil** gezegene yavaş ve dik inmen gerekiyor. Hem hız hem açı tutmalı. Dikkat: "dik" ekrana göre değil, **gezegen yüzeyine** göredir — yani roketin burnu, indiğin noktada gezegenin merkezinden dışa doğru bakmalı. Hedefe yaklaşınca açılan **iniş rehberi** bunu gösterir (aşağıya bak).
 - **Mavi** gezegen geldiğin yer. Üzerinde durabilirsin ama hızlı çarparsan ölürsün.
 - **Beyaz** gezegenler yolun üstündeki kütleler. Yörüngeni büker; tuzak da olabilir, hızlanma fırsatı da.
-- **Mor** girdap bir kara deliktir. Çekimi bir gezegeninkinden çok daha güçlü — yörüngeni sertçe büker. Olay ufkuna girersen seni yutar ve sıçramayı kaybedersin. Ustalıkla kullanırsan sapan etkisiyle hızlanmanın da yoludur. 4. sıçramadan sonra çıkmaya başlar.
+- **Mor** girdap bir kara deliktir. Çekimi bir gezegeninkinden çok daha güçlü — yörüngeni sertçe büker. Olay ufkuna (ortadaki koyu disk) girersen seni yutar ve sıçramayı kaybedersin. Etrafındaki **soluk mor halka** tehlike bölgesini önceden gösteren bir uyarı çemberidir. Ustalıkla kullanırsan sapan etkisiyle hızlanmanın da yoludur. 4. sıçramadan sonra çıkmaya başlar ve artık diğer gezegenlerle üst üste binmez.
 - **Kapsüller** yol boyunca dağılmış toplanabilir öğelerdir. Yeşil altıgen (**F**) yakıt verir, sarı altıgen (**$**) kredi. Rotandan sapıp risk almana değer katarlar; bazen tam da kara deliğin yanında dururlar.
 - Yakıt sınırlı ve sıçramalar arasında taşınıyor. Tersaneden ikmal almak para gerektiriyor.
 

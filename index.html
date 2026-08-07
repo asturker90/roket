@@ -30,7 +30,7 @@
 
 /* ===================== EKRAN ===================== */
 const W = 1200, H = 800;
-const SURUM = "v1.7";
+const SURUM = "v1.8";
 document.title = `ROKET ${SURUM} — YOLCULUK`;
 const cvs = document.getElementById("c");
 const ctx = cvs.getContext("2d");
@@ -104,6 +104,20 @@ function gezegenYap(x, y, r, m) {
            hedef:false, baslangic:false, kurtarma:false, mekik:null, faz:Math.random()*6.28 };
 }
 
+/* Verilen dogrultuda, mevcut gezegen ve kara deliklerden yeterince uzak bir yer
+   bulmaya calisir. Bulamazsa null doner (o nesne o sicramada atlanir). */
+function yerAra(bazX, bazY, dik, sapMin, sapGen, r, boslukGez, boslukKara) {
+  for (let i = 0; i < 12; i++) {
+    const sap = (Math.random() < 0.5 ? -1 : 1) * (sapMin + Math.random()*sapGen);
+    const x = bazX + Math.cos(dik)*sap, y = bazY + Math.sin(dik)*sap;
+    let ok = true;
+    for (const g of gezegenler) if (Math.hypot(g.x-x, g.y-y) < g.r + r + boslukGez) { ok = false; break; }
+    if (ok) for (const k of karaDelikler) if (Math.hypot(k.x-x, k.y-y) < k.r + r + boslukKara) { ok = false; break; }
+    if (ok) return { x, y };
+  }
+  return null;
+}
+
 function hedefUret() {
   const b = basGez();
   yon += (Math.random()-0.5) * 1.5;
@@ -119,21 +133,23 @@ function hedefUret() {
   if (etap >= 3 && Math.random() < 0.55) {
     const t = 0.42 + Math.random()*0.16;
     const px = b.x + (hx-b.x)*t, py = b.y + (hy-b.y)*t;
-    const dik = yon + Math.PI/2, sap = (Math.random() < 0.5 ? -1 : 1) * (110 + Math.random()*90);
-    gezegenler.push(gezegenYap(px + Math.cos(dik)*sap, py + Math.sin(dik)*sap,
-                               62 + Math.random()*30, 1.6 + Math.random()*0.8));
+    const r = 62 + Math.random()*30;
+    const yer = yerAra(px, py, yon + Math.PI/2, 110, 90, r, 45, 85);
+    if (yer) gezegenler.push(gezegenYap(yer.x, yer.y, r, 1.6 + Math.random()*0.8));
   }
 
   // kurtarma gezegeni: uzerinde mahsur mekik — yakit ver, kurtar, bol para al (opsiyonel durak)
   if (etap >= 2 && Math.random() < 0.45) {
     const t = 0.40 + Math.random()*0.20;
     const px = b.x + (hx-b.x)*t, py = b.y + (hy-b.y)*t;
-    const dik = yon + Math.PI/2, sap = (Math.random() < 0.5 ? -1 : 1) * (150 + Math.random()*95);
-    const kp = gezegenYap(px + Math.cos(dik)*sap, py + Math.sin(dik)*sap,
-                          58 + Math.random()*20, 1.0 + Math.random()*0.5);
-    kp.kurtarma = true;
-    kp.mekik = { yakit:0, kap:40, gitti:false, aci:Math.random()*6.2832 };
-    gezegenler.push(kp);
+    const r = 58 + Math.random()*20;
+    const yer = yerAra(px, py, yon + Math.PI/2, 150, 95, r, 45, 85);
+    if (yer) {
+      const kp = gezegenYap(yer.x, yer.y, r, 1.0 + Math.random()*0.5);
+      kp.kurtarma = true;
+      kp.mekik = { yakit:0, kap:40, gitti:false, aci:Math.random()*6.2832 };
+      gezegenler.push(kp);
+    }
   }
 
   // goktaslari
@@ -150,12 +166,14 @@ function hedefUret() {
   }
 
   // kara delik (yercekimi tuzagi / sapan) — 4. etaptan sonra
+  // en son uretilir; tum gezegenlerden acikca uzak bir yere konur (yoksa atlanir)
   if (etap >= 4 && Math.random() < 0.5) {
     const t = 0.40 + Math.random()*0.22;
     const px = b.x + (hx-b.x)*t, py = b.y + (hy-b.y)*t;
-    const dik = yon + Math.PI/2, sap = (Math.random() < 0.5 ? -1 : 1) * (135 + Math.random()*95);
-    karaDelikler.push({ x:px + Math.cos(dik)*sap, y:py + Math.sin(dik)*sap,
-      r:27 + Math.random()*9, etkiR:360, m:9 + Math.random()*4, faz:Math.random()*6.28 });
+    const r = 27 + Math.random()*9;
+    const yer = yerAra(px, py, yon + Math.PI/2, 135, 95, r, 65, 130);
+    if (yer) karaDelikler.push({ x:yer.x, y:yer.y,
+      r, etkiR:360, m:9 + Math.random()*4, faz:Math.random()*6.28 });
   }
 
   // toplanabilir kapsuller (yakit / kredi)
