@@ -3,6 +3,16 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada tutulur.
 Sürümleme kabaca [SemVer](https://semver.org/lang/tr/) mantığını izler.
 
+## [v1.8] — 2026-08-07
+
+### Düzeltildi
+- **Nesne çakışması önlendi**: Yol üstündeki büyük cisimler (beyaz ara kütle,
+  kurtarma gezegeni, kara delik) artık birbirinin ve mevcut gezegenlerin üstüne
+  binmiyor. Yeni `yerAra()` yardımcısı her cisim için, mevcut gezegen/kara
+  deliklerden yeterince uzak bir konum bulana kadar (en çok 12 deneme) yer arar;
+  bulamazsa o cisim o sıçramada atlanır. Kara delik en son ve en geniş boşlukla
+  yerleştirilir. 600 sıçramalık testte 0 çakışma.
+
 ## [v1.7] — 2026-08-07
 
 ### Eklendi
