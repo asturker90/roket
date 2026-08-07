@@ -30,7 +30,7 @@
 
 /* ===================== EKRAN ===================== */
 const W = 1200, H = 800;
-const SURUM = "v1.6";
+const SURUM = "v1.7";
 document.title = `ROKET ${SURUM} — YOLCULUK`;
 const cvs = document.getElementById("c");
 const ctx = cvs.getContext("2d");
@@ -86,7 +86,8 @@ const SARFLAR = [
 
 /* ===================== DUNYA ===================== */
 let gezegenler = [], taslar = [], parcalar = [], iz = [], fuzeler = [];
-let karaDelikler = [], kapsuller = [];
+let karaDelikler = [], kapsuller = [], gidenMekikler = [];
+let bildirim = null;
 let roket, yakit = 0, fuzeSayi = 0, kalkan = 0, para = 0;
 let etap = 1, durum = "hazir", mesaj = null, sure = 0, toplamDeneme = 0;
 let atisSayac = 0, sarsinti = 0, dukkanSecim = 0, sonKazanc = null;
@@ -100,7 +101,7 @@ const hedefGez = () => gezegenler.find(g => g.hedef);
 
 function gezegenYap(x, y, r, m) {
   return { id:sonrakiId++, x, y, r, m, vx:0, vy:0, kraterler:[],
-           hedef:false, baslangic:false, faz:Math.random()*6.28 };
+           hedef:false, baslangic:false, kurtarma:false, mekik:null, faz:Math.random()*6.28 };
 }
 
 function hedefUret() {
@@ -121,6 +122,18 @@ function hedefUret() {
     const dik = yon + Math.PI/2, sap = (Math.random() < 0.5 ? -1 : 1) * (110 + Math.random()*90);
     gezegenler.push(gezegenYap(px + Math.cos(dik)*sap, py + Math.sin(dik)*sap,
                                62 + Math.random()*30, 1.6 + Math.random()*0.8));
+  }
+
+  // kurtarma gezegeni: uzerinde mahsur mekik — yakit ver, kurtar, bol para al (opsiyonel durak)
+  if (etap >= 2 && Math.random() < 0.45) {
+    const t = 0.40 + Math.random()*0.20;
+    const px = b.x + (hx-b.x)*t, py = b.y + (hy-b.y)*t;
+    const dik = yon + Math.PI/2, sap = (Math.random() < 0.5 ? -1 : 1) * (150 + Math.random()*95);
+    const kp = gezegenYap(px + Math.cos(dik)*sap, py + Math.sin(dik)*sap,
+                          58 + Math.random()*20, 1.0 + Math.random()*0.5);
+    kp.kurtarma = true;
+    kp.mekik = { yakit:0, kap:40, gitti:false, aci:Math.random()*6.2832 };
+    gezegenler.push(kp);
   }
 
   // goktaslari
@@ -172,24 +185,26 @@ function temizle() {
   kapsuller = kapsuller.filter(k => k.canli && Math.hypot(k.x-b.x, k.y-b.y) < 1900);
 }
 
+function gezKopya(g) { return { ...g, kraterler: g.kraterler.map(k => ({...k})), mekik: g.mekik ? {...g.mekik} : null }; }
 function anlikGoruntu() {
   return {
-    gezegenler: gezegenler.map(g => ({ ...g, kraterler: g.kraterler.map(k => ({...k})) })),
+    gezegenler: gezegenler.map(gezKopya),
     taslar: taslar.map(t => ({ ...t })),
     karaDelikler: karaDelikler.map(k => ({ ...k })),
     kapsuller: kapsuller.map(k => ({ ...k })),
-    roket: { ...roket }, yakit, fuzeSayi, kalkan, yon, sure
+    roket: { ...roket }, yakit, fuzeSayi, kalkan, para, yon, sure
   };
 }
 function anlikKaydet() { kayit = anlikGoruntu(); }
 function anlikGeriYukle(k, uyduMu) {
-  gezegenler = k.gezegenler.map(g => ({ ...g, kraterler: g.kraterler.map(c => ({...c})) }));
+  gezegenler = k.gezegenler.map(gezKopya);
   taslar = k.taslar.map(t => ({ ...t }));
   karaDelikler = k.karaDelikler.map(c => ({ ...c }));
   kapsuller = k.kapsuller.map(c => ({ ...c }));
   roket = { ...k.roket };
-  yakit = k.yakit; fuzeSayi = k.fuzeSayi; kalkan = k.kalkan; yon = k.yon;
-  parcalar = []; iz = []; fuzeler = []; atisSayac = 0; sarsinti = 0; mesaj = null;
+  yakit = k.yakit; fuzeSayi = k.fuzeSayi; kalkan = k.kalkan; para = k.para; yon = k.yon;
+  parcalar = []; iz = []; fuzeler = []; gidenMekikler = []; bildirim = null;
+  atisSayac = 0; sarsinti = 0; mesaj = null;
   if (uyduMu) {   // uydudan diril: yerinde, durgun, hemen kontrol sende
     roket.vx = roket.vy = 0; roket.canli = true; durum = "ucus"; sure = k.sure;
   } else { sure = 0; durum = "hazir"; }
@@ -218,7 +233,7 @@ function etapBaslat() {
   hedefUret();
   anlikKaydet();
   sure = 0; durum = "hazir"; mesaj = null;
-  parcalar = []; iz = []; fuzeler = [];
+  parcalar = []; iz = []; fuzeler = []; gidenMekikler = []; bildirim = null;
 }
 
 function yenidenBasla() {
@@ -226,7 +241,7 @@ function yenidenBasla() {
   para = 0; etap = 1; toplamDeneme = 0; sonKazanc = null;
   yakit = kapasite(); fuzeSayi = 0; kalkan = 0; yon = -0.35;
   uyduSayi = 0; uyduKayit = null; uyduKonum = null;
-  sonrakiId = 1; gezegenler = []; taslar = []; karaDelikler = []; kapsuller = [];
+  sonrakiId = 1; gezegenler = []; taslar = []; karaDelikler = []; kapsuller = []; gidenMekikler = []; bildirim = null;
 
   const ilk = gezegenYap(0, 0, 92, 1.2);
   ilk.baslangic = true;
@@ -473,6 +488,20 @@ function fuzeCarpti(m, p) {
   gezegenler = gezegenler.filter(g => !g.yokOldu);
 }
 
+function mekikKurtar(p) {   // mekigin yakiti doldu: kalkip gider, bol para birakir
+  p.mekik.gitti = true;
+  const a = p.mekik.aci;
+  const sx = p.x + Math.cos(a)*p.r, sy = p.y + Math.sin(a)*p.r;
+  const saci = Math.atan2(Math.cos(a), -Math.sin(a));   // radyal disa bakan roket acisi
+  gidenMekikler.push({ x:sx, y:sy, vx:Math.cos(a)*40, vy:Math.sin(a)*40,
+                       ax:Math.cos(a), ay:Math.sin(a), aci:saci, omur:2.4 });
+  const odul = 320 + etap*45;
+  para += odul;
+  bildirim = { metin:`MEKIK KURTARILDI   +${odul} KREDI`, omur:2.8 };
+  patlamaEfekti(sx, sy, 30, "#f5c44d", 160);
+  sarsinti = Math.max(sarsinti, 6);
+}
+
 /* ===================== FIZIK ===================== */
 function guncelle(dt) {
   const pad = kolOku();
@@ -485,6 +514,17 @@ function guncelle(dt) {
 
   if (sarsinti > 0) sarsinti = Math.max(0, sarsinti - dt*26);
   if (durum === "ucus") sure += dt;
+  if (bildirim) { bildirim.omur -= dt; if (bildirim.omur <= 0) bildirim = null; }
+
+  for (const m of gidenMekikler) {   // kurtarilan mekik uzaklasir
+    m.vx += m.ax*130*dt; m.vy += m.ay*130*dt;
+    m.x += m.vx*dt; m.y += m.vy*dt; m.omur -= dt;
+    if (Math.random() < 0.7)
+      parcalar.push({ x:m.x-m.ax*18, y:m.y-m.ay*18,
+        vx:-m.ax*130+(Math.random()-0.5)*60, vy:-m.ay*130+(Math.random()-0.5)*60,
+        omur:0.3+Math.random()*0.2, renk:"#fff" });
+  }
+  gidenMekikler = gidenMekikler.filter(m => m.omur > 0);
 
   for (const p of gezegenler) {
     p.x += p.vx*dt; p.y += p.vy*dt;
@@ -594,8 +634,10 @@ function guncelle(dt) {
   roket.ayak += (((enYakin < 150) ? 1 : 0) - roket.ayak) * Math.min(1, dt*6);
 
   const h = hedefGez(), b = basGez();
-  const uzaklik = Math.min(h ? Math.hypot(roket.x-h.x, roket.y-h.y) : 1e9,
-                           b ? Math.hypot(roket.x-b.x, roket.y-b.y) : 1e9);
+  let uzaklik = Math.min(h ? Math.hypot(roket.x-h.x, roket.y-h.y) : 1e9,
+                         b ? Math.hypot(roket.x-b.x, roket.y-b.y) : 1e9);
+  for (const p of gezegenler) if (p.kurtarma)   // kurtarma duragi da capa sayilir
+    uzaklik = Math.min(uzaklik, Math.hypot(roket.x-p.x, roket.y-p.y));
   if (uzaklik > 1750) { bitir(false, "UZAYA SAVRULDUN"); return; }
 
   for (const t of taslar) {
@@ -632,6 +674,23 @@ function guncelle(dt) {
         roket.vx = roket.vy = 0; roket.aci = nAci; roket.ayak = 1;
         sonInisId = p.id;
         bitir(true, "INIS BASARILI", { hiz, fark });
+        return;
+      }
+
+      /* Kurtarma gezegeni: yuzeyde dur, duzgun konumdaysan mekige yakit aktar */
+      if (p.kurtarma) {
+        if (hiz >= inisHizi()*1.5) { bitir(false, "COK HIZLI"); return; }  // sert carpma = olum
+        roket.x = p.x + nx*(p.r+AYAK_BOY);
+        roket.y = p.y + ny*(p.r+AYAK_BOY);
+        const vn = (roket.vx-p.vx)*nx + (roket.vy-p.vy)*ny;
+        if (vn < 0) { roket.vx -= vn*nx; roket.vy -= vn*ny; }
+        roket.vx += (p.vx-roket.vx)*0.25; roket.vy += (p.vy-roket.vy)*0.25;
+        roket.ayak = 1;
+        if (!p.mekik.gitti && hiz < inisHizi() && fark < inisAcisi()) {   // duzgun konum: aktar
+          const ver = Math.min(30*dt, p.mekik.kap - p.mekik.yakit, Math.max(0, yakit - 15));
+          yakit -= ver; p.mekik.yakit += ver;
+          if (p.mekik.yakit >= p.mekik.kap - 0.4) mekikKurtar(p);
+        }
         return;
       }
 
@@ -729,13 +788,13 @@ function roketCiz(x, y, aci, itkiVar, ayak) {
 }
 
 function gezegenCiz(p) {
-  const h = p.hedef, b = p.baslangic;
-  const renk = h ? "#7cf5c0" : (b ? "#8ad4ff" : "#fff");
-  ctx.shadowColor = renk; ctx.shadowBlur = h ? 16 : 8;
+  const h = p.hedef, b = p.baslangic, kr = p.kurtarma;
+  const renk = h ? "#7cf5c0" : (b ? "#8ad4ff" : (kr ? "#f5c44d" : "#fff"));
+  ctx.shadowColor = renk; ctx.shadowBlur = h ? 16 : (kr ? 12 : 8);
   ctx.strokeStyle = renk; ctx.lineWidth = h ? 2.2 : 1.6;
   ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.2832); ctx.stroke();
   ctx.shadowBlur = 0; ctx.lineWidth = 1;
-  ctx.strokeStyle = h ? "rgba(124,245,192,0.3)" : (b ? "rgba(138,212,255,0.28)" : "rgba(255,255,255,0.18)");
+  ctx.strokeStyle = h ? "rgba(124,245,192,0.3)" : (b ? "rgba(138,212,255,0.28)" : (kr ? "rgba(245,196,77,0.3)" : "rgba(255,255,255,0.18)"));
   for (let k = 0; k < 20; k++) {
     const a = (k/20)*6.2832 + p.faz;
     ctx.beginPath();
@@ -757,6 +816,19 @@ function gezegenCiz(p) {
     ctx.strokeStyle = "rgba(124,245,192,0.5)"; ctx.globalAlpha = 1-nb;
     ctx.beginPath(); ctx.arc(p.x, p.y, p.r+12+nb*26, 0, 6.2832); ctx.stroke();
     ctx.globalAlpha = 1;
+  }
+  // kurtarma gezegeni: yuzeyde mahsur mekik (sana benzer) + yakit gostergesi
+  if (kr && p.mekik && !p.mekik.gitti) {
+    const a = p.mekik.aci;
+    const sx = p.x+Math.cos(a)*p.r, sy = p.y+Math.sin(a)*p.r;
+    const saci = Math.atan2(Math.cos(a), -Math.sin(a));
+    roketCiz(sx, sy, saci, false, 0.5);
+    const gx = p.x+Math.cos(a)*(p.r+34), gy = p.y+Math.sin(a)*(p.r+34);
+    ctx.save(); ctx.shadowBlur = 0;
+    ctx.strokeStyle = "rgba(245,196,77,0.7)"; ctx.lineWidth = 1;
+    ctx.strokeRect(gx-16, gy-3, 32, 6);
+    ctx.fillStyle = "#f5c44d"; ctx.fillRect(gx-15, gy-2, 30*(p.mekik.yakit/p.mekik.kap), 4);
+    ctx.restore();
   }
 }
 
@@ -815,16 +887,22 @@ function kalkanCiz(x, y) {
   ctx.restore();
 }
 
-/* Hedefe gore hizalama durumu — hem rehber hem HUD kullanir */
+/* Yaklasilan inilebilir gezegene gore hizalama — hem rehber hem HUD kullanir.
+   Hedef ya da mekigi kurtulmamis kurtarma gezegeninden en yakini secilir. */
 function hedefHizalama() {
-  const h = hedefGez();
-  if (!h) return null;
-  const dx = roket.x-h.x, dy = roket.y-h.y, d = Math.hypot(dx,dy) || 1;
+  let en = null, enD = 1e9;
+  for (const p of gezegenler) {
+    if (!(p.hedef || (p.kurtarma && p.mekik && !p.mekik.gitti))) continue;
+    const d = Math.hypot(roket.x-p.x, roket.y-p.y);
+    if (d < enD) { enD = d; en = p; }
+  }
+  if (!en) return null;
+  const dx = roket.x-en.x, dy = roket.y-en.y, d = Math.hypot(dx,dy) || 1;
   const nAci = Math.atan2(dx, -dy);
   const fark = Math.abs(((roket.aci-nAci+Math.PI*3)%(Math.PI*2))-Math.PI);
-  const hiz = Math.hypot(roket.vx-h.vx, roket.vy-h.vy);
-  return { h, d, nx:dx/d, ny:dy/d, nAci, fark, hiz,
-           yaklasma: d-h.r, aciTamam: fark<inisAcisi(), hizTamam: hiz<inisHizi() };
+  const hiz = Math.hypot(roket.vx-en.vx, roket.vy-en.vy);
+  return { h:en, d, nx:dx/d, ny:dy/d, nAci, fark, hiz, kurtarma:!!en.kurtarma,
+           yaklasma: d-en.r, aciTamam: fark<inisAcisi(), hizTamam: hiz<inisHizi() };
 }
 
 /* Inis rehberi — hedefe yaklasinca dogru acyi ve durumu gosterir */
@@ -960,6 +1038,11 @@ function ciz() {
     ctx.fillRect(p.x-1.4, p.y-1.4, 2.8, 2.8);
   }
   ctx.globalAlpha = 1;
+  for (const m of gidenMekikler) {   // kurtarilip uzaklasan mekik
+    ctx.globalAlpha = Math.max(0, Math.min(1, m.omur/1.2));
+    roketCiz(m.x, m.y, m.aci, true, 0);
+  }
+  ctx.globalAlpha = 1;
   if (uyduKonum) uyduCiz(uyduKonum.x, uyduKonum.y);
   if (durum === "ucus") inisRehberi();
   if ((roket.canli || durum === "indi") && kalkan > 0) kalkanCiz(roket.x, roket.y);
@@ -973,6 +1056,13 @@ function ciz() {
 
 function arayuz() {
   ctx.shadowBlur = 0;
+  if (bildirim) {   // kurtarma gibi olaylar icin ortada gecici bildirim
+    ctx.textAlign = "center"; ctx.font = "700 22px ui-monospace, monospace";
+    ctx.globalAlpha = Math.max(0, Math.min(1, bildirim.omur*1.5));
+    ctx.shadowColor = "#f5c44d"; ctx.shadowBlur = 14; ctx.fillStyle = "#f5c44d";
+    ctx.fillText(bildirim.metin, W/2, 210);
+    ctx.shadowBlur = 0; ctx.globalAlpha = 1; ctx.textAlign = "left";
+  }
   const hiz = Math.hypot(roket.vx, roket.vy);
   const h = hedefGez();
   ctx.font = "13px ui-monospace, monospace"; ctx.textAlign = "left";
@@ -1018,6 +1108,7 @@ function arayuz() {
                "Dokunmatik: alttaki tuslar  ·  Fuze icin once TERSANE'den FUZE RAMPASI al"];
     if (kapsuller.length)    s.push("Kapsulleri topla — F: +yakit, $: +kredi");
     if (karaDelikler.length) s.push("Kara delige dikkat: cekimi guclu, olay ufku olduruyor");
+    if (gezegenler.some(g=>g.kurtarma)) s.push("Sari gezegende mahsur mekik var — duzgun in, yakit ver, kurtar, bol para al");
     if (uyduSayi > 0)        s.push("UYDU birak (C / ekran tusu): olursen oradan devam edersin");
     if (bedavaIkmal)         s.push("Acil yakit ikmali yapildi (45)");
     kutu(etap === 1 ? "YOLCULUK BASLIYOR" : `${etap}. SICRAMA`, s, "DOKUN / ENTER");

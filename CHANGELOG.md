@@ -3,6 +3,22 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada tutulur.
 Sürümleme kabaca [SemVer](https://semver.org/lang/tr/) mantığını izler.
 
+## [v1.7] — 2026-08-07
+
+### Eklendi
+- **Kurtarma görevi (çift duraklı yolculuk)**: Bazı sıçramalarda yolun üstünde sarı
+  bir gezegen çıkar; üzerinde mahsur kalmış, oyuncuya benzeyen bir uzay mekiği durur.
+  - Gezegene düzgün inince (yavaş + dik) oyuncunun yakıtı mekiğe akar; oyuncu en az
+    15 birim rezerv tutar (mahsur kalmaz). Sert çarpma ölüm, nazik-ama-eğik temas
+    güvenli ama yakıt akmaz.
+  - Mekik dolunca kalkıp uzaklaşır (itki izli animasyon) ve büyük bir kredi ödülü
+    bırakır (320 + etap·45). Ortada "MEKIK KURTARILDI" bildirimi görünür.
+  - Opsiyonel bir durak: uğramadan da hedefe gidilebilir. İniş rehberi ve "AÇI"
+    göstergesi artık yaklaşılan en yakın inilebilir gezegene (hedef ya da kurtarma)
+    göre çalışır.
+  - Sarı gezegen + yakıt göstergeli mekik çizimi; anlık görüntü sistemine mekik ve
+    `para` alanı eklendi (ölünce ödül tekrar tekrar alınamaz; uydu bırakırsan kilitlenir).
+
 ## [v1.6] — 2026-08-07
 
 ### İyileştirildi
