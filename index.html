@@ -30,6 +30,7 @@
 
 /* ===================== EKRAN ===================== */
 const W = 1200, H = 800;
+const SURUM = "v1.1";
 const cvs = document.getElementById("c");
 const ctx = cvs.getContext("2d");
 let scale = 1, offX = 0, offY = 0;
@@ -832,6 +833,8 @@ function ciz() {
 
 function arayuz() {
   ctx.shadowBlur = 0;
+  ctx.font = "11px ui-monospace, monospace"; ctx.textAlign = "left";
+  ctx.fillStyle = "rgba(255,255,255,0.22)"; ctx.fillText(`ROKET ${SURUM}`, 20, H-14);
   const hiz = Math.hypot(roket.vx, roket.vy);
   const h = hedefGez();
   ctx.font = "13px ui-monospace, monospace"; ctx.textAlign = "left";

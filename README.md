@@ -1,5 +1,7 @@
 # ROKET
 
+**Sürüm: v1.1** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md).
+
 Yerçekimi tabanlı bir uzay yolculuğu oyunu. Tek HTML dosyası, bağımlılık yok, çevrimdışı çalışır.
 
 Bir gezegenden kalkıp bir sonrakine iniyorsun. İndiğin gezegen, bir sonraki sıçramanın kalkış noktası oluyor — bölümler ayrı sahneler değil, tek bir kesintisiz yolculuk.
