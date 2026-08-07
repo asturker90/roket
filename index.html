@@ -30,6 +30,7 @@
 
 /* ===================== EKRAN ===================== */
 const W = 1200, H = 800;
+const SURUM = "v1.1";
 const cvs = document.getElementById("c");
 const ctx = cvs.getContext("2d");
 let scale = 1, offX = 0, offY = 0;
@@ -80,6 +81,7 @@ const SARFLAR = [
 
 /* ===================== DUNYA ===================== */
 let gezegenler = [], taslar = [], parcalar = [], iz = [], fuzeler = [];
+let karaDelikler = [], kapsuller = [];
 let roket, yakit = 0, fuzeSayi = 0, para = 0;
 let etap = 1, durum = "hazir", mesaj = null, sure = 0, toplamDeneme = 0;
 let atisSayac = 0, sarsinti = 0, dukkanSecim = 0, sonKazanc = null;
@@ -127,6 +129,25 @@ function hedefUret() {
       vx:Math.cos(ha)*hiz, vy:Math.sin(ha)*hiz,
       r:18 + Math.random()*13, faz:Math.random()*6.28, canli:true, merkezX:px, merkezY:py });
   }
+
+  // kara delik (yercekimi tuzagi / sapan) — 4. etaptan sonra
+  if (etap >= 4 && Math.random() < 0.5) {
+    const t = 0.40 + Math.random()*0.22;
+    const px = b.x + (hx-b.x)*t, py = b.y + (hy-b.y)*t;
+    const dik = yon + Math.PI/2, sap = (Math.random() < 0.5 ? -1 : 1) * (135 + Math.random()*95);
+    karaDelikler.push({ x:px + Math.cos(dik)*sap, y:py + Math.sin(dik)*sap,
+      r:27 + Math.random()*9, etkiR:360, m:9 + Math.random()*4, faz:Math.random()*6.28 });
+  }
+
+  // toplanabilir kapsuller (yakit / kredi)
+  const kapAdet = 1 + Math.floor(Math.random()*2);
+  for (let i = 0; i < kapAdet; i++) {
+    const t = 0.3 + Math.random()*0.45;
+    const px = b.x + (hx-b.x)*t, py = b.y + (hy-b.y)*t;
+    const dik = yon + Math.PI/2, sap = (Math.random()-0.5)*360;
+    kapsuller.push({ x:px + Math.cos(dik)*sap, y:py + Math.sin(dik)*sap,
+      r:13, tur: Math.random() < 0.5 ? "yakit" : "kredi", faz:Math.random()*6.28, canli:true });
+  }
 }
 
 function temizle() {
@@ -141,18 +162,24 @@ function temizle() {
     gezegenler = gezegenler.filter(g => !sil.has(g.id));
   }
   taslar = taslar.filter(t => t.canli && Math.hypot(t.x-b.x, t.y-b.y) < 1700);
+  karaDelikler = karaDelikler.filter(k => Math.hypot(k.x-b.x, k.y-b.y) < 1900);
+  kapsuller = kapsuller.filter(k => k.canli && Math.hypot(k.x-b.x, k.y-b.y) < 1900);
 }
 
 function anlikKaydet() {
   kayit = {
     gezegenler: gezegenler.map(g => ({ ...g, kraterler: g.kraterler.map(k => ({...k})) })),
     taslar: taslar.map(t => ({ ...t })),
+    karaDelikler: karaDelikler.map(k => ({ ...k })),
+    kapsuller: kapsuller.map(k => ({ ...k })),
     roket: { ...roket }, yakit, fuzeSayi, yon
   };
 }
 function anlikYukle() {
   gezegenler = kayit.gezegenler.map(g => ({ ...g, kraterler: g.kraterler.map(k => ({...k})) }));
   taslar = kayit.taslar.map(t => ({ ...t }));
+  karaDelikler = kayit.karaDelikler.map(k => ({ ...k }));
+  kapsuller = kayit.kapsuller.map(k => ({ ...k }));
   roket = { ...kayit.roket };
   yakit = kayit.yakit; fuzeSayi = kayit.fuzeSayi; yon = kayit.yon;
   parcalar = []; iz = []; fuzeler = []; atisSayac = 0; sarsinti = 0;
@@ -173,7 +200,7 @@ function yenidenBasla() {
   seviye = { tank:0, itki:0, jiro:0, ayak:0, fuze:0 };
   para = 0; etap = 1; toplamDeneme = 0; sonKazanc = null;
   yakit = kapasite(); fuzeSayi = 0; yon = -0.35;
-  sonrakiId = 1; gezegenler = []; taslar = [];
+  sonrakiId = 1; gezegenler = []; taslar = []; karaDelikler = []; kapsuller = [];
 
   const ilk = gezegenYap(0, 0, 92, 1.2);
   ilk.baslangic = true;
@@ -443,6 +470,12 @@ function guncelle(dt) {
       const d = Math.sqrt(d2), f = GRAV*p.m/d2*0.35;
       m.vx += (dx/d)*f*dt; m.vy += (dy/d)*f*dt;
     }
+    for (const k of karaDelikler) {
+      const dx = k.x-m.x, dy = k.y-m.y, d2 = Math.max(dx*dx+dy*dy, 100);
+      const d = Math.sqrt(d2), f = GRAV*k.m/d2;
+      m.vx += (dx/d)*f*dt; m.vy += (dy/d)*f*dt;
+      if (d < k.r) m.omur = 0;   // olay ufkuna giren fuze yutulur
+    }
     m.x += m.vx*dt; m.y += m.vy*dt; m.omur -= dt;
     if (Math.random() < 0.6)
       parcalar.push({ x:m.x, y:m.y, vx:(Math.random()-0.5)*30, vy:(Math.random()-0.5)*30,
@@ -500,6 +533,13 @@ function guncelle(dt) {
     const f = GRAV*p.m/d2;
     roket.vx += (dx/d)*f*dt; roket.vy += (dy/d)*f*dt;
   }
+  for (const k of karaDelikler) {
+    const dx = k.x-roket.x, dy = k.y-roket.y;
+    const d2 = Math.max(dx*dx+dy*dy, 100), d = Math.sqrt(d2);
+    const f = GRAV*k.m/d2;
+    roket.vx += (dx/d)*f*dt; roket.vy += (dy/d)*f*dt;
+    if (d < k.r + 6) { patlamaEfekti(roket.x, roket.y, 30, "#c77dff", 120); bitir(false, "KARA DELIK"); return; }
+  }
   roket.x += roket.vx*dt; roket.y += roket.vy*dt;
   iz.push({ x:roket.x, y:roket.y });
   if (iz.length > 300) iz.shift();
@@ -517,6 +557,18 @@ function guncelle(dt) {
     const dx = t.x-roket.x, dy = t.y-roket.y;
     if (dx*dx+dy*dy < (t.r+11)*(t.r+11)) { bitir(false, "GOKTASI"); return; }
   }
+
+  for (const k of kapsuller) {
+    if (!k.canli) continue;
+    const dx = k.x-roket.x, dy = k.y-roket.y;
+    if (dx*dx+dy*dy < (k.r+14)*(k.r+14)) {
+      k.canli = false;
+      if (k.tur === "yakit") { yakit = Math.min(kapasite(), yakit+25);
+        patlamaEfekti(k.x, k.y, 18, "#7cf5c0", 90); }
+      else { para += 40; patlamaEfekti(k.x, k.y, 18, "#f5d97c", 90); }
+    }
+  }
+  kapsuller = kapsuller.filter(k => k.canli);
 
   for (const p of gezegenler) {
     const dx = roket.x-p.x, dy = roket.y-p.y, d = Math.hypot(dx,dy);
@@ -653,6 +705,46 @@ function gezegenCiz(p) {
   }
 }
 
+function karaDelikCiz(k) {
+  const t = performance.now()/1000;
+  // etki alani (soluk halka — tehlike bolgesini onceden belli eder)
+  ctx.shadowBlur = 0; ctx.strokeStyle = "rgba(199,125,255,0.10)"; ctx.lineWidth = 1/kam.s;
+  ctx.beginPath(); ctx.arc(k.x, k.y, k.etkiR, 0, 6.2832); ctx.stroke();
+  // yutucu disk — donen yaylar
+  ctx.shadowColor = "#c77dff";
+  for (let i = 0; i < 3; i++) {
+    ctx.shadowBlur = 12;
+    ctx.strokeStyle = `rgba(199,125,255,${0.55 - i*0.13})`;
+    ctx.lineWidth = 2.4 - i*0.5;
+    const a0 = t*(1.5 - i*0.35) + k.faz + i;
+    ctx.beginPath(); ctx.arc(k.x, k.y, k.r + 10 + i*9, a0, a0 + 4.2); ctx.stroke();
+  }
+  // olay ufku
+  ctx.shadowBlur = 18; ctx.shadowColor = "#c77dff"; ctx.fillStyle = "#000";
+  ctx.beginPath(); ctx.arc(k.x, k.y, k.r, 0, 6.2832); ctx.fill();
+  ctx.strokeStyle = "#c77dff"; ctx.lineWidth = 1.8;
+  ctx.beginPath(); ctx.arc(k.x, k.y, k.r, 0, 6.2832); ctx.stroke();
+  ctx.shadowBlur = 0;
+}
+
+function kapsulCiz(k) {
+  const t = performance.now()/1000;
+  const renk = k.tur === "yakit" ? "#7cf5c0" : "#f5d97c";
+  const puls = 1 + Math.sin(t*3 + k.faz)*0.12;
+  ctx.save(); ctx.translate(k.x, k.y); ctx.rotate(t*0.8 + k.faz); ctx.scale(puls, puls);
+  ctx.shadowColor = renk; ctx.shadowBlur = 12; ctx.strokeStyle = renk; ctx.lineWidth = 1.8;
+  ctx.beginPath();
+  for (let i = 0; i < 6; i++) {
+    const a = (i/6)*6.2832, x = Math.cos(a)*k.r, y = Math.sin(a)*k.r;
+    i ? ctx.lineTo(x,y) : ctx.moveTo(x,y);
+  }
+  ctx.closePath(); ctx.stroke(); ctx.restore();
+  ctx.save(); ctx.translate(k.x, k.y); ctx.shadowBlur = 0; ctx.fillStyle = renk;
+  ctx.font = "700 12px ui-monospace, monospace"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.fillText(k.tur === "yakit" ? "F" : "$", 0, 1);
+  ctx.textAlign = "left"; ctx.textBaseline = "alphabetic"; ctx.restore();
+}
+
 function ekranTuslariCiz() {
   if (kolBagli) return;
   const basili = new Set();
@@ -699,7 +791,9 @@ function ciz() {
     ctx.stroke();
   }
   ctx.lineJoin = "round"; ctx.lineCap = "round";
+  for (const k of karaDelikler) karaDelikCiz(k);
   for (const p of gezegenler) gezegenCiz(p);
+  for (const k of kapsuller) if (k.canli) kapsulCiz(k);
 
   ctx.shadowColor = "#ff5c4d"; ctx.shadowBlur = 10;
   ctx.strokeStyle = "#ff5c4d"; ctx.lineWidth = 1.6;
@@ -739,6 +833,8 @@ function ciz() {
 
 function arayuz() {
   ctx.shadowBlur = 0;
+  ctx.font = "11px ui-monospace, monospace"; ctx.textAlign = "left";
+  ctx.fillStyle = "rgba(255,255,255,0.22)"; ctx.fillText(`ROKET ${SURUM}`, 20, H-14);
   const hiz = Math.hypot(roket.vx, roket.vy);
   const h = hedefGez();
   ctx.font = "13px ui-monospace, monospace"; ctx.textAlign = "left";
@@ -767,7 +863,9 @@ function arayuz() {
     const s = ["Mavi gezegenden kalk, yesil gezegene in. Her inis bir sonrakinin kalkis noktasi.",
                "Klavye: OK tuslari = don/itki  ·  X = FUZE AT  ·  Kol: A itki, B fuze",
                "Dokunmatik: alttaki tuslar  ·  Fuze icin once TERSANE'den FUZE RAMPASI al"];
-    if (bedavaIkmal) s.push("", "Acil yakit ikmali yapildi (45)");
+    if (kapsuller.length)    s.push("Kapsulleri topla — F: +yakit, $: +kredi");
+    if (karaDelikler.length) s.push("Kara delige dikkat: cekimi guclu, olay ufku olduruyor");
+    if (bedavaIkmal)         s.push("Acil yakit ikmali yapildi (45)");
     kutu(etap === 1 ? "YOLCULUK BASLIYOR" : `${etap}. SICRAMA`, s, "DOKUN / ENTER");
   } else if (durum === "patladi") {
     kutu(mesaj, [`Sure ${sure.toFixed(1)} sn`, "Sicrama basina donuluyor"], "TEKRAR ICIN DOKUN", "#ff5c4d");

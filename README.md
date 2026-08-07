@@ -1,5 +1,7 @@
 # ROKET
 
+**Sürüm: v1.1** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md).
+
 Yerçekimi tabanlı bir uzay yolculuğu oyunu. Tek HTML dosyası, bağımlılık yok, çevrimdışı çalışır.
 
 Bir gezegenden kalkıp bir sonrakine iniyorsun. İndiğin gezegen, bir sonraki sıçramanın kalkış noktası oluyor — bölümler ayrı sahneler değil, tek bir kesintisiz yolculuk.
@@ -9,6 +11,8 @@ Bir gezegenden kalkıp bir sonrakine iniyorsun. İndiğin gezegen, bir sonraki s
 - **Yeşil** gezegene yavaş ve dik inmen gerekiyor. Hem hız hem açı tutmalı.
 - **Mavi** gezegen geldiğin yer. Üzerinde durabilirsin ama hızlı çarparsan ölürsün.
 - **Beyaz** gezegenler yolun üstündeki kütleler. Yörüngeni büker; tuzak da olabilir, hızlanma fırsatı da.
+- **Mor** girdap bir kara deliktir. Çekimi bir gezegeninkinden çok daha güçlü — yörüngeni sertçe büker. Olay ufkuna girersen seni yutar ve sıçramayı kaybedersin. Ustalıkla kullanırsan sapan etkisiyle hızlanmanın da yoludur. 4. sıçramadan sonra çıkmaya başlar.
+- **Kapsüller** yol boyunca dağılmış toplanabilir öğelerdir. Yeşil altıgen (**F**) yakıt verir, sarı altıgen (**$**) kredi. Rotandan sapıp risk almana değer katarlar; bazen tam da kara deliğin yanında dururlar.
 - Yakıt sınırlı ve sıçramalar arasında taşınıyor. Tersaneden ikmal almak para gerektiriyor.
 
 ## Füze
