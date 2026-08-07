@@ -3,6 +3,14 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada tutulur.
 Sürümleme kabaca [SemVer](https://semver.org/lang/tr/) mantığını izler.
 
+## [v1.6] — 2026-08-07
+
+### İyileştirildi
+- **Dokunmatik butonlarda klavye tuşu**: Her ekran tuşunun altına karşılık gelen
+  klavye tuşu yazıldı — ◀ (A), ▶ (D), ▲ (W), FÜZE (X), UYDU (C). Oyuncular yönerge
+  okumadan hangi tuşun ne işe yaradığını görebiliyor. Etiket biraz yukarı alınıp
+  altına küçük, soluk tuş ipucu eklendi.
+
 ## [v1.5] — 2026-08-07
 
 ### Eklendi
