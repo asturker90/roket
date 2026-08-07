@@ -1,6 +1,6 @@
 # ROKET
 
-**Sürüm: v1.6** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md).
+**Sürüm: v1.7** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md).
 
 Yerçekimi tabanlı bir uzay yolculuğu oyunu. Tek HTML dosyası, bağımlılık yok, çevrimdışı çalışır.
 
@@ -46,6 +46,17 @@ Hedefe yaklaşınca bir rehber açılır ve düzgün inip inmediğini anında g�
 - Yüzeyde bir **kılavuz koni** belirir; ortadaki kesikli çizgi doğru "yukarı" (yüzey normali) yönünü, iki kenar da kabul edilen açı aralığını gösterir. Roketin burnunu bu koninin içine getir.
 - Roketin etrafındaki **durum ışığı** renk değiştirir: **kırmızı** = eğiksin, **sarı** = açı düz ama çok hızlısın (yavaşla), **yeşil** = düz ve yeterince yavaş, inebilirsin.
 - Sağ üstte **AÇI ✓ DÜZ / ✗ EĞİK** göstergesi aynı bilgiyi metin olarak verir.
+
+## Kurtarma görevi (sarı gezegen)
+
+Bazı sıçramalarda yolun üstünde **sarı bir gezegen** çıkar; üzerinde sana benzeyen, **mahsur kalmış bir uzay mekiği** durur. İstersen uğramadan hedefe gidebilirsin — ama uğrarsan:
+
+1. Sarı gezegene **düzgün in** (yavaş + dik). Sert çarparsan ölürsün; nazikçe ama eğik değersen ölmezsin ama yakıt akmaz.
+2. Düzgün konumda beklerken **kendi yakıtından mekiğe akar** — senin yakıtın azalır, onun göstergesi dolar (kendine en az bir miktar yakıt ayrılır, mahsur kalmazsın).
+3. Mekik dolunca **kalkıp uzaklaşır** ve kurtulduğu için sana **bol miktarda kredi** bırakır.
+4. Sonra oradan kalkıp kendi hedefine devam edersin — yani tek durak değil, çift duraklı bir yolculuk.
+
+Yakıtından verdiğin için bu bir tercih: yolun uzar, yakıtın azalır, ama ödül büyüktür.
 
 ## Tersane
 
