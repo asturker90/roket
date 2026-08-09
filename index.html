@@ -30,7 +30,7 @@
 
 /* ===================== EKRAN ===================== */
 const W = 1200, H = 800;
-const SURUM = "v2.3";
+const SURUM = "v2.4";
 document.title = `ROKET ${SURUM} — YOLCULUK`;
 const cvs = document.getElementById("c");
 const ctx = cvs.getContext("2d");
@@ -80,8 +80,10 @@ const SARFLAR = [
     uygun:()=> yakit < kapasite()-1, uygula:()=>{ yakit = Math.min(kapasite(), yakit+35); } },
   { ad:"FUZE IKMALI",  aciklama:"+1 fuze",   fiyat:()=>90,
     uygun:()=> seviye.fuze>0 && fuzeSayi<fuzeKap(), uygula:()=>{ fuzeSayi = Math.min(fuzeKap(), fuzeSayi+1); } },
-  { ad:"UYDU", aciklama:"+1 kontrol noktasi; ucarken birak, olursen oradan basla", fiyat:()=>130,
-    uygun:()=> uyduSayi < 5, uygula:()=>{ uyduSayi++; } }
+  { ad:"CAN", aciklama:"+1 kalp; olunce 1 kalp gider, hepsi biterse en bastan", fiyat:()=>500,
+    uygun:()=> can < CAN_MAX, uygula:()=>{ can++; } },
+  { ad:"UYDU", aciklama:"kontrol noktasi (1 tasirsin); ucarken birak, olunce oradan devam", fiyat:()=>260,
+    uygun:()=> uyduSayi < 1, uygula:()=>{ uyduSayi++; } }
 ];
 
 /* ===================== DUNYA ===================== */
@@ -95,6 +97,8 @@ let atisSayac = 0, sarsinti = 0, dukkanSecim = 0, sonKazanc = null;
 let kolBagli = false, sonrakiId = 1, yon = -0.35, bedavaIkmal = false;
 let kayit = null;   // etap basi anlik goruntu
 let uyduSayi = 0, uyduKayit = null, uyduKonum = null;   // kontrol noktasi (uydu)
+const CAN_BASLA = 3, CAN_MAX = 5;
+let can = CAN_BASLA;   // kalp/can: her olum 1 goturur; hepsi biterse en bastan
 const kam = { x:0, y:0, s:1, hx:0, hy:0, hs:1, ilk:true };
 
 const basGez = () => gezegenler.find(g => g.baslangic);
@@ -241,11 +245,15 @@ function anlikGeriYukle(k, uyduMu) {
   } else { sure = 0; durum = "hazir"; }
 }
 function anlikYukle() { anlikGeriYukle(kayit, false); }
-function diril() {   // olunce cagirilir — uydu varsa oradan devam, YOKSA en bastan (1. bolum)
+function diril() {   // olunce cagirilir (can bitir()'de zaten dusuruldu)
   toplamDeneme++;
-  if (uyduKayit) { anlikGeriYukle(uyduKayit, true); return; }
+  if (can > 0) {   // hala can var: uydu varsa oradan, yoksa sicrama basindan devam
+    if (uyduKayit) anlikGeriYukle(uyduKayit, true);
+    else anlikYukle();
+    return;
+  }
   const deneme = toplamDeneme;
-  yenidenBasla();          // her sey sifirlanir: para, yukseltmeler, bolum -> dikkat & strateji onemli
+  yenidenBasla();          // tum canlar bitti -> her sey sifir (can 3'e doner), 1. bolum
   toplamDeneme = deneme;   // toplam deneme (olum) sayaci korunur
 }
 function uyduBirak() {   // ucarken kontrol noktasi birak (sarf malzeme)
@@ -275,7 +283,7 @@ function yenidenBasla() {
   seviye = { tank:0, itki:0, jiro:0, ayak:0, fuze:0, kalkan:0 };
   para = 0; etap = 1; toplamDeneme = 0; sonKazanc = null;
   yakit = kapasite(); fuzeSayi = 0; kalkan = 0; yon = -0.35;
-  uyduSayi = 0; uyduKayit = null; uyduKonum = null;
+  uyduSayi = 0; uyduKayit = null; uyduKonum = null; can = CAN_BASLA;
   ufo = null; ufoTimer = -1; dusmanFuzeler = [];
   sonrakiId = 1; gezegenler = []; taslar = []; karaDelikler = []; kapsuller = []; gidenMekikler = []; bildirim = null;
 
@@ -466,7 +474,7 @@ function dukkanSatirlari() {
   return r;
 }
 function dukkanY(idx, n) {   // sarf grubu | yukseltme grubu (bosluk) | devam (bosluk)
-  return 232 + idx*54 + (idx >= SARFLAR.length ? 14 : 0) + (idx === n-1 ? 14 : 0);
+  return 214 + idx*50 + (idx >= SARFLAR.length ? 13 : 0) + (idx === n-1 ? 13 : 0);
 }
 function satirSec(sel) {
   const row = dukkanSatirlari()[sel];
@@ -855,7 +863,7 @@ function bitir(basarili, metin, kalite) {
     sonKazanc = { temel, yumusak, dik, sureBonus, toplam,
                   hizYuzde: Math.round(hizOran*100), dikYuzde: Math.round(aciOran*100) };
     para += toplam;
-  } else { patlamaEfekti(roket.x, roket.y, 42, "#fff", 250); sarsinti = 13; }
+  } else { can = Math.max(0, can-1); patlamaEfekti(roket.x, roket.y, 42, "#fff", 250); sarsinti = 13; }
 }
 
 /* ===================== CIZIM ===================== */
@@ -1238,7 +1246,9 @@ function arayuz() {
   ctx.fillStyle = "#6a6a6a";
   ctx.fillText(`${etap}. SICRAMA`, 20, 30);
   ctx.fillText(`DENEME ${toplamDeneme}`, 20, 50);
-  let yy = 74;
+  let yy = 72;
+  for (let i = 0; i < Math.max(can, CAN_BASLA); i++) kalpCiz(28 + i*22, yy-4, 8, i < can);   // canlar
+  yy += 26;
   altinCiz(20, yy, `${para} KREDI`, "13px ui-monospace, monospace"); yy += 22;
   ctx.font = "13px ui-monospace, monospace";
   if (seviye.fuze > 0)   { ctx.fillStyle = "#ff9a4d"; ctx.fillText(`FUZE ${fuzeSayi}/${fuzeKap()}`, 20, yy); yy += 22; }
@@ -1284,7 +1294,9 @@ function arayuz() {
     kutu(etap === 1 ? "YOLCULUK BASLIYOR" : `${etap}. SICRAMA — ${blokAdi()}`, s, "DOKUN / ENTER");
   } else if (durum === "patladi") {
     kutu(mesaj, [`Sure ${sure.toFixed(1)} sn`,
-         uyduKayit ? "Birakilan uyduya donuluyor" : "UYDU yok — EN BASTAN basliyorsun (1. bolum, sifir para)"],
+         can > 0
+           ? `${can} can kaldi · ${uyduKayit ? "birakilan uyduya donuluyor" : "sicrama basina donuluyor"}`
+           : "TUM CANLAR BITTI — EN BASTAN basliyorsun (1. bolum, sifir para)"],
          "TEKRAR ICIN DOKUN", "#ff5c4d");
   } else if (durum === "indi") {
     kutu(mesaj, [
@@ -1336,6 +1348,16 @@ function pilCiz(x, y, w, h, oran, renk) {   // yatay pil/yakit bari (sagda ucu)
   ctx.fillStyle = renk; ctx.fillRect(x+1.5, y+1.5, Math.max(0, w-3)*Math.max(0, Math.min(1, oran)), h-3);
   ctx.restore();
 }
+function kalpCiz(cx, cy, s, dolu) {   // kalp (can) simgesi; dolu=false ise ici bos
+  ctx.save(); ctx.beginPath();
+  ctx.moveTo(cx, cy + s*0.35);
+  ctx.bezierCurveTo(cx - s, cy - s*0.30, cx - s*0.5, cy - s, cx, cy - s*0.32);
+  ctx.bezierCurveTo(cx + s*0.5, cy - s, cx + s, cy - s*0.30, cx, cy + s*0.35);
+  ctx.closePath();
+  if (dolu) { ctx.fillStyle = "#ff4d6a"; ctx.shadowColor = "#ff4d6a"; ctx.shadowBlur = 6; ctx.fill(); }
+  else { ctx.strokeStyle = "#7a3040"; ctx.lineWidth = 1.5; ctx.shadowBlur = 0; ctx.stroke(); }
+  ctx.restore();
+}
 
 function dukkanCiz() {
   ctx.textAlign = "center";
@@ -1345,14 +1367,15 @@ function dukkanCiz() {
   ctx.font = "12px ui-monospace, monospace"; ctx.fillStyle = "rgba(245,217,124,0.6)";
   ctx.fillText(`ROKET ${SURUM}`, W/2, 58);
 
-  // ust bilgi seridi: altin (coin) + yakit pili + fuze
+  // ust bilgi seridi: canlar + altin (coin) + yakit pili + fuze
   const yb = 138;
-  altinCiz(W/2 - 280, yb, `${para} KREDI`, "16px ui-monospace, monospace");
+  for (let i = 0; i < Math.max(can, CAN_BASLA); i++) kalpCiz(W/2 - 350 + i*24, yb-5, 9, i < can);
+  altinCiz(W/2 - 200, yb, `${para} KREDI`, "16px ui-monospace, monospace");
   ctx.textAlign = "left"; ctx.font = "14px ui-monospace, monospace"; ctx.fillStyle = "#8a8a8a";
-  ctx.fillText("YAKIT", W/2 - 40, yb);
-  pilCiz(W/2 + 24, yb-13, 130, 15, yakit/kapasite(), yakit < kapasite()*0.25 ? "#ff5c4d" : "#7cf5c0");
-  ctx.fillStyle = "#cfcfcf"; ctx.fillText(`${yakit.toFixed(0)}/${kapasite()}`, W/2 + 164, yb);
-  if (seviye.fuze) { ctx.fillStyle = "#ff9a4d"; ctx.fillText(`FUZE ${fuzeSayi}/${fuzeKap()}`, W/2 + 270, yb); }
+  ctx.fillText("YAKIT", W/2 - 10, yb);
+  pilCiz(W/2 + 48, yb-13, 120, 15, yakit/kapasite(), yakit < kapasite()*0.25 ? "#ff5c4d" : "#7cf5c0");
+  ctx.fillStyle = "#cfcfcf"; ctx.fillText(`${yakit.toFixed(0)}/${kapasite()}`, W/2 + 178, yb);
+  if (seviye.fuze) { ctx.fillStyle = "#ff9a4d"; ctx.fillText(`FUZE ${fuzeSayi}/${fuzeKap()}`, W/2 + 282, yb); }
 
   ctx.textAlign = "center"; ctx.font = "12px ui-monospace, monospace"; ctx.fillStyle = "#6a6a6a";
   ctx.fillText("Yukari/Asagi sec · Enter veya A ile al · dokunmatikte satira dokun", W/2, 168);
@@ -1401,6 +1424,9 @@ function dukkanCiz() {
       ctx.textAlign = "left"; ctx.font = "11px ui-monospace, monospace"; ctx.fillStyle = "#8a8a8a";
       ctx.fillText(`${yakit.toFixed(0)}/${kapasite()}`, 686, y+16);
     }
+    // can satirinda mevcut kalpler
+    if (sarfMi && SARFLAR[row.i].ad === "CAN")
+      for (let k = 0; k < CAN_MAX; k++) kalpCiz(694 + k*22, y-4, 8, k < can);
     ctx.textAlign = "right"; ctx.font = "15px ui-monospace, monospace";
     ctx.fillStyle = doluMu ? "#4a4a4a" : (alinabilir ? "#f5d97c" : "#5a4a2a");
     ctx.fillText(fiyatMetni, 976, y+4);
