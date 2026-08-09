@@ -1,6 +1,6 @@
 # ROKET
 
-**Sürüm: v2.1** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md).
+**Sürüm: v2.2** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md).
 
 Yerçekimi tabanlı bir uzay yolculuğu oyunu. Tek HTML dosyası, bağımlılık yok, çevrimdışı çalışır.
 
@@ -70,17 +70,17 @@ Bazı sıçramalarda yolun üstünde **sarı bir gezegen** çıkar; üzerinde sa
 
 Yakıtından verdiğin için bu bir tercih: yolun uzar, yakıtın azalır, ama ödül büyüktür.
 
-## UFO (20. sıçramadan sonra)
+## UFO (16. sıçramadan sonra)
 
-20. sıçramayı geçtikten sonra her sıçramada bir **düşman UFO** belirir. Haritaya **rastgele bir kenardan, rastgele bir zamanda** girer — nereden geleceğini bilemezsin. Görünür alanı çaprazlarken sana doğru **toplam 3 füze** atar (pembe oklar). Füzeye değersen ölürsün; **kalkanın** varsa emer.
+16. sıçramadan itibaren (Tehlike Bölgesi) her sıçramada bir **düşman UFO** belirir. Haritaya **rastgele bir kenardan, rastgele bir zamanda** girer — nereden geleceğini bilemezsin. Görünür alanı çaprazlarken sana doğru belli aralıklarla füze atar — **16-20 arası 3, 21-25 arası 4, 26+ için 5** füze (pembe oklar). Füzeye değersen ölürsün; **kalkanın** varsa emer.
 
 Bir uyarı ("UFO YAKLASIYOR") gelir. İki seçeneğin var: **kaç** (füzeleri savuştur), ya da **kendi füzenle UFO'yu vur** — vurursan patlar ve **+150 kredi** verir.
 
 ## Tersane
 
-Her inişten sonra açılır. Altı yükseltme ve üç sarf malzemesi var.
+Her inişten sonra açılır. En sık kullanılan **sarf malzemeleri (yakıt/füze/uydu ikmali) listenin en üstündedir**; altında altı kalıcı yükseltme, en altta bir sonraki sıçramaya geçiş vardır. Üst şeritte altın-coin ile kredin ve pil gibi dolan bir **yakıt göstergesi** (sayı + bar) durur.
 
-**Motor** itkiyi %14 artırır ama yakıt tüketimini %20 artırır — net kazanç değil, bir tercih. **Füze rampası** kapasiteyi 2 artırır ve dolu gelir. **Kalkan** her seviyede bir yük ekler; her sıçrama başında dolar ve bir göktaşı ya da kara delik çarpmasını emerek seni kurtarır (kara delikte acil fırlatma yapar). İniş hatalarını engellemez — beceri hâlâ sende.
+Yükseltmelerin hepsi 5 seviyeye çıkar; **yakıt tankı ise 10 seviyeye** kadar. **Motor** itkiyi %14 artırır ama yakıt tüketimini %20 artırır — net kazanç değil, bir tercih. **Füze rampası** kapasiteyi 2 artırır ve dolu gelir. **Kalkan** her seviyede bir yük ekler; her sıçrama başında dolar ve bir göktaşı ya da kara delik çarpmasını emerek seni kurtarır (kara delikte acil fırlatma yapar). İniş hatalarını engellemez — beceri hâlâ sende.
 
 ## Uydu (kontrol noktası)
 
