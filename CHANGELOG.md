@@ -3,6 +3,18 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada tutulur.
 Sürümleme kabaca [SemVer](https://semver.org/lang/tr/) mantığını izler.
 
+## [v2.3] — 2026-08-09
+
+### Değiştirildi (ölüm artık kalıcı — dikkat & strateji)
+- **Ölünce oyun tamamen sıfırlanır**: 1. bölüm, sıfır kredi, sıfır yükseltme.
+  Önceden sadece o sıçramanın başına dönülüyordu; artık her hata tüm ilerlemeyi siler.
+- **Tek istisna uydu**: Bırakılmış bir uydu (kontrol noktası) varsa ölünce baştan değil,
+  uydudan devam edilir (para/yükseltme korunur). Uydu böylece tek "can simidi" oldu.
+- Ekrandaki **BAŞTAN** tuşu artık oyunu gerçekten en baştan başlatır (sıçrama tekrarı değil);
+  bedavaya sıçrama tekrarlama açığı kapatıldı.
+- Ölüm ekranı mesajı güncellendi ("UYDU yok — EN BASTAN basliyorsun" / "Birakilan uyduya donuluyor").
+- Toplam deneme (ölüm) sayacı baştan başlarken de korunur.
+
 ## [v2.2] — 2026-08-07
 
 ### Değiştirildi (Tersane elden geçirildi)
