@@ -3,6 +3,23 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada tutulur.
 Sürümleme kabaca [SemVer](https://semver.org/lang/tr/) mantığını izler.
 
+## [v2.5] — 2026-08-09
+
+### Eklendi (İki kişilik yerel mod — co-opetition)
+- Başlangıç ekranında **2** tuşu ile aynı ekranda 2 kişilik mod. 1P'ye dokunulmadan ayrı bir
+  modül olarak eklendi (`guncelleIkili`/`ikiliCiz` ve yardımcıları).
+- İki roket (mavi P1, turuncu P2) aynı dünyada; **ortak ilerleme**: ilk hedefe inen bölümü açar,
+  ikisi de bir sonraki bölüme geçer. "Gidebildiğin kadar git."
+- Her oyuncunun **kendi yakıtı ve 3 kalbi**; kalp bitince elenir, diğeri tek başına devam eder.
+  Kalp varken bölüm başından kısa dokunulmazlıkla dirilir. Yakıt kapsüllerden dolar.
+- **Friendly fire açık**: füzen rakibi vurursa ona kalp kaybettirir (kendi füzen sana zarar vermez);
+  füzeler sahibinin rengiyle çizilir.
+- İkisi de elenince **en uzağa giden (son elenen) kazanır**; kazanan ekranı (2 = tekrar, 1 = tek kişilik).
+- Kontroller: P1 = oklar + Sağ Shift, P2 = WASD + Sol Shift; 2 gamepad de desteklenir (pad0→P1, pad1→P2).
+- HUD: sol/sağ köşede oyuncu panelleri (kalpler + yakıt pili + füze); kamera iki roketi de çerçeveler.
+- `roketCiz()` artık renk parametresi alır; `kameraGuncelle` 2P'de iki roketi çerçeveler.
+- Not: 2P arcade'dir (tersane/yükseltme yok). Online sürüm ileride planlanıyor.
+
 ## [v2.4] — 2026-08-09
 
 ### Eklendi (can / kalp sistemi)
