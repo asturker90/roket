@@ -3,6 +3,19 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada tutulur.
 Sürümleme kabaca [SemVer](https://semver.org/lang/tr/) mantığını izler.
 
+## [v2.6] — 2026-08-09
+
+### Eklendi
+- **GitHub Pages yayını**: `.github/workflows/pages.yml` ile her `main` güncellemesinde
+  otomatik dağıtım. Oyun: https://asturker90.github.io/roket/
+
+### Değiştirildi (2 kişilik mod)
+- **Bir sonraki bölüme geçmek için ikisinin de hedefe inmesi gerekir.** Önce inen roket
+  hedefte park edip (halka + "INDI ▸ BEKLIYOR") diğerini bekler; ikisi de inince birlikte
+  ilerlenir. Biri elenmişse tek kalan inince ilerler.
+- **Tuşlar ekranda**: her oyuncunun kontrol tuşları kendi panelinde yazıyor
+  (P1: ← → ↑ + Sağ Shift · P2: A D W + Sol Shift) — "türk milleti okumaz" :)
+
 ## [v2.5] — 2026-08-09
 
 ### Eklendi (İki kişilik yerel mod — co-opetition)

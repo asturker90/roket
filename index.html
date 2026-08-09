@@ -30,7 +30,7 @@
 
 /* ===================== EKRAN ===================== */
 const W = 1200, H = 800;
-const SURUM = "v2.5";
+const SURUM = "v2.6";
 document.title = `ROKET ${SURUM} — YOLCULUK`;
 const cvs = document.getElementById("c");
 const ctx = cvs.getContext("2d");
@@ -1462,7 +1462,7 @@ function dukkanCiz() {
 
 /* ===================== 2 KISILIK YEREL MOD ===================== */
 function ikiliRoketYap(no) {
-  return { no, x:0, y:0, vx:0, vy:0, aci:0, itki:false, canli:true, ayak:1,
+  return { no, x:0, y:0, vx:0, vy:0, aci:0, itki:false, canli:true, ayak:1, indi:false,
     yakit:TEMEL.yakit, can:CAN_BASLA, kalkan:0, fuzeSayi:3, atisSayac:0, koruma:0,
     iz:[], elenme:false, elemeSira:0, enEtap:1,
     girdi:{ sol:false, sag:false, itki:false, ates:false } };
@@ -1471,7 +1471,7 @@ function ikiliKonumla(r, b) {   // roketi kalkis gezegeninin yuzeyine yerlestir
   const yan = r.no ? 1 : -1;
   const a = -0.4 + yan*0.35;
   r.x = b.x + Math.sin(a)*(b.r+AYAK_BOY); r.y = b.y - Math.cos(a)*(b.r+AYAK_BOY);
-  r.vx = r.vy = 0; r.aci = a; r.itki = false; r.canli = true; r.ayak = 1; r.iz = []; r.koruma = 1.2;
+  r.vx = r.vy = 0; r.aci = a; r.itki = false; r.canli = true; r.ayak = 1; r.iz = []; r.koruma = 1.2; r.indi = false;
 }
 function ikiliEtapKur() {   // dunyayi uret + yasayan roketleri kalkisa diz
   temizle(); hedefUret();
@@ -1583,7 +1583,7 @@ function guncelleIkili(dt) {
 
   // --- her roket ---
   for (const r of roketler) {
-    if (r.elenme) continue;
+    if (r.elenme || r.indi) continue;   // elenen ya da hedefte bekleyen roket islenmez
     if (r.koruma > 0) r.koruma -= dt;
     // girdi (klavye + gamepad)
     const pad = ikiliPadOku(r.no), g = r.girdi;
@@ -1644,10 +1644,11 @@ function guncelleIkili(dt) {
       if (d < p.r + AYAK_BOY) {
         const nx=dx/d, ny=dy/d, hiz=Math.hypot(r.vx-p.vx,r.vy-p.vy), nAci=Math.atan2(dx,-dy);
         const fark=Math.abs(((r.aci-nAci+Math.PI*3)%(Math.PI*2))-Math.PI);
-        if (p.hedef && hiz < TEMEL.inHiz && fark < TEMEL.inAci) {   // BASARILI INIS -> herkes ilerler
-          r.x=p.x+nx*(p.r+AYAK_BOY); r.y=p.y+ny*(p.r+AYAK_BOY); r.vx=r.vy=0; r.aci=nAci; r.ayak=1;
-          bildirim = { metin:`${P_RENK[r.no].ad} INDI — ${etap+1}. BOLUM`, omur:1.4 };
-          ikiliSonrakiEtap(p.id); return;
+        if (p.hedef && hiz < TEMEL.inHiz && fark < TEMEL.inAci) {   // hedefe indi: park et, digerini bekle
+          r.x=p.x+nx*(p.r+AYAK_BOY); r.y=p.y+ny*(p.r+AYAK_BOY); r.vx=r.vy=0; r.aci=nAci; r.ayak=1; r.indi=true;
+          const kalan = roketler.filter(o => !o.elenme && !o.indi).length;
+          bildirim = { metin:`${P_RENK[r.no].ad} INDI` + (kalan ? " — digerini bekliyor" : ""), omur:1.4 };
+          bitti=true; break;
         }
         if (p.baslangic && hiz < TEMEL.inHiz*1.5) {   // kalkis yuzeyinde dur
           r.x=p.x+nx*(p.r+AYAK_BOY); r.y=p.y+ny*(p.r+AYAK_BOY);
@@ -1661,14 +1662,21 @@ function guncelleIkili(dt) {
     if (bitti) continue;
   }
 
-  // olen ama caniolan roketleri kalkistan dirilt; herkes elendiyse oyun biter
+  // olen ama caniolan roketleri kalkistan dirilt (bekleyenler haric)
   const b = basGez();
-  for (const r of roketler) if (!r.canli && !r.elenme && b) ikiliKonumla(r, b);
-  if (roketler.every(r => r.elenme)) {
+  for (const r of roketler) if (!r.canli && !r.elenme && !r.indi && b) ikiliKonumla(r, b);
+
+  if (roketler.every(r => r.elenme)) {   // herkes elendi -> oyun biter
     durum = "bitti2p";
     const sirali = [...roketler].sort((a,c) => (c.enEtap-a.enEtap) || (c.elemeSira-a.elemeSira));
     kazanan = (sirali[0].enEtap === sirali[1].enEtap && sirali[0].elemeSira === sirali[1].elemeSira)
       ? null : sirali[0].no;
+    return;
+  }
+  const yasayanlar = roketler.filter(r => !r.elenme);   // ikisi de (yasayan) hedefe indiyse birlikte ilerle
+  if (yasayanlar.length && yasayanlar.every(r => r.indi)) {
+    const hg = hedefGez();
+    if (hg) ikiliSonrakiEtap(hg.id);
   }
 }
 
@@ -1703,6 +1711,10 @@ function ikiliCiz() {
   for (const r of roketler) {
     if (r.elenme || !r.canli) continue;
     if (r.koruma > 0 && Math.floor(r.koruma*10)%2) continue;   // dirilis yanip sonmesi
+    if (r.indi) {   // hedefte bekleyen roket: cevresinde halka
+      ctx.save(); ctx.strokeStyle = P_RENK[r.no].ana; ctx.globalAlpha = 0.55; ctx.lineWidth = 2/kam.s;
+      ctx.beginPath(); ctx.arc(r.x, r.y, 27, 0, 6.2832); ctx.stroke(); ctx.globalAlpha = 1; ctx.restore();
+    }
     roketCiz(r.x, r.y, r.aci, r.itki, r.ayak, P_RENK[r.no].ana);
   }
   dunyaBitir();
@@ -1721,13 +1733,17 @@ function ikiliArayuz() {
   ctx.fillText(`${etap}. BOLUM — ${blokAdi()}`, W/2, 64);
   // iki oyuncu paneli (sol=P1, sag=P2)
   const panel = (r, sag) => {
-    const x = sag ? W-210 : 20, hiz = ctx.textAlign;
+    const x = sag ? W-210 : 20;
     ctx.textAlign = "left"; ctx.font="13px ui-monospace, monospace";
-    ctx.fillStyle = P_RENK[r.no].ana; ctx.fillText(P_RENK[r.no].ad + (r.elenme?"  ELENDI":""), x, 30);
+    const durumEk = r.elenme ? "  ELENDI" : (r.indi ? "  INDI ▸ BEKLIYOR" : "");
+    ctx.fillStyle = P_RENK[r.no].ana; ctx.fillText(P_RENK[r.no].ad + durumEk, x, 30);
     for (let i=0;i<Math.max(r.can,CAN_BASLA);i++) kalpCiz(x+8+i*20, 48, 7, i<r.can);
-    ctx.fillStyle="#8a8a8a"; ctx.fillText("YKT", x, 74);
+    ctx.fillStyle="#8a8a8a"; ctx.font="13px ui-monospace, monospace"; ctx.fillText("YKT", x, 74);
     pilCiz(x+34, 63, 90, 12, r.yakit/TEMEL.yakit, r.yakit<TEMEL.yakit*0.25?"#ff5c4d":"#7cf5c0");
     ctx.fillStyle="#ff9a4d"; ctx.font="12px ui-monospace, monospace"; ctx.fillText(`FUZE ${r.fuzeSayi}`, x, 92);
+    ctx.fillStyle="#6a6a6a"; ctx.font="10px ui-monospace, monospace";   // tuslar (yonerge okumadan gorunsun)
+    ctx.fillText(r.no===0 ? "← → don  ↑ gaz  SAG SHIFT ates"
+                          : "A D don  W gaz  SOL SHIFT ates", x, 108);
   };
   if (roketler[0]) panel(roketler[0], false);
   if (roketler[1]) panel(roketler[1], true);
