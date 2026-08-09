@@ -3,6 +3,16 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada tutulur.
 Sürümleme kabaca [SemVer](https://semver.org/lang/tr/) mantığını izler.
 
+## [v2.7] — 2026-08-09
+
+### Eklendi (2 kişilik derinlik)
+- **Füze ikmali (2P)**: sarı (para) kapsüller artık +1 füze verir (maks 6); yeşil kapsül yakıt.
+  Böylece füzeler bitince friendly fire ölmez, düello sürebilir.
+- **Uydu (2P)**: her oyuncuya bölüm başına 1 kontrol noktası. P1 `.` / P2 `Q` ile bırakılır;
+  ölünce uydunun olduğu yerden dirilir (o kullanımda tükenir). Bırakılmış uydu haritada
+  oyuncu renginde baklava simgesiyle gösterilir.
+- Panellerde füze/uydu sayısı ve uydu tuşu da yazıyor.
+
 ## [v2.6] — 2026-08-09
 
 ### Eklendi

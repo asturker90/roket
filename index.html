@@ -30,7 +30,7 @@
 
 /* ===================== EKRAN ===================== */
 const W = 1200, H = 800;
-const SURUM = "v2.6";
+const SURUM = "v2.7";
 document.title = `ROKET ${SURUM} — YOLCULUK`;
 const cvs = document.getElementById("c");
 const ctx = cvs.getContext("2d");
@@ -371,7 +371,13 @@ addEventListener("keydown", e => {
   // mod gecisleri
   if (e.key === "2" && !e.repeat && (durum === "hazir" || durum === "bitti2p")) { ikiliBasla(); return; }
   if (e.key === "1" && !e.repeat && durum === "bitti2p") { ikili = false; yenidenBasla(); return; }
-  if (ikili) { ikiliTus(e.code, true); return; }   // 2P: sadece oyun kontrolleri
+  if (ikili) {   // 2P: sadece oyun kontrolleri
+    if (!e.repeat && durum === "ucus") {
+      if (e.code === "Period") ikiliUyduBirak(0);   // P1 uydu
+      if (e.code === "KeyQ")   ikiliUyduBirak(1);   // P2 uydu
+    }
+    ikiliTus(e.code, true); return;
+  }
   if (SOL_T.includes(e.key)) kb.sol = true;
   if (SAG_T.includes(e.key)) kb.sag = true;
   if (ITKI_T.includes(e.key) || e.code === "Space") kb.itki = true;
@@ -1464,6 +1470,7 @@ function dukkanCiz() {
 function ikiliRoketYap(no) {
   return { no, x:0, y:0, vx:0, vy:0, aci:0, itki:false, canli:true, ayak:1, indi:false,
     yakit:TEMEL.yakit, can:CAN_BASLA, kalkan:0, fuzeSayi:3, atisSayac:0, koruma:0,
+    uydu:1, uyduNokta:null,   // bolum basina 1 kontrol noktasi
     iz:[], elenme:false, elemeSira:0, enEtap:1,
     girdi:{ sol:false, sag:false, itki:false, ates:false } };
 }
@@ -1478,7 +1485,7 @@ function ikiliEtapKur() {   // dunyayi uret + yasayan roketleri kalkisa diz
   fuzeler = []; parcalar = []; gidenMekikler = []; bildirim = null; ufo = null; dusmanFuzeler = [];
   ufoTimer = etap >= 16 ? 2.5 + Math.random()*4.5 : -1;
   const b = basGez();
-  for (const r of roketler) if (!r.elenme) { ikiliKonumla(r, b); r.yakit = TEMEL.yakit; r.enEtap = etap; }
+  for (const r of roketler) if (!r.elenme) { ikiliKonumla(r, b); r.yakit = TEMEL.yakit; r.enEtap = etap; r.uydu = 1; r.uyduNokta = null; }
   durum = "ucus"; sure = 0; sarsinti = 0;
 }
 function ikiliBasla() {
@@ -1503,6 +1510,14 @@ function ikiliVur(r, sebep) {   // bir roket hasar aldi (carpma/fuze). kalkan em
   patlamaEfekti(r.x, r.y, 42, P_RENK[r.no].ana, 250); sarsinti = 13;
   bildirim = { metin:`${P_RENK[r.no].ad}: ${sebep}`, omur:1.6 };
   if (r.can <= 0) { r.elenme = true; r.elemeSira = ++eleme; }
+}
+function ikiliUyduBirak(no) {   // 2P kontrol noktasi (bolum basina 1): olunce oradan devam
+  const r = roketler[no];
+  if (!r || r.elenme || !r.canli || r.indi || r.uydu <= 0 || durum !== "ucus") return;
+  r.uydu--;
+  r.uyduNokta = { x:r.x, y:r.y, aci:r.aci, yakit:r.yakit };
+  patlamaEfekti(r.x, r.y, 20, P_RENK[no].ana, 120); sarsinti = Math.max(sarsinti, 4);
+  bildirim = { metin:`${P_RENK[no].ad} UYDU BIRAKTI`, omur:1.3 };
 }
 function ikiliPadOku(no) {   // gamepad no -> P(no) girdisi
   const out = { sol:false, sag:false, itki:false, ates:false };
@@ -1634,8 +1649,9 @@ function guncelleIkili(dt) {
     // kapsul
     for (const k of kapsuller) { if (!k.canli) continue; const dx=k.x-r.x, dy=k.y-r.y;
       if (dx*dx+dy*dy < (k.r+14)*(k.r+14)) { k.canli=false;
-        if (k.tur==="yakit") { r.yakit=Math.min(TEMEL.yakit, r.yakit+25); patlamaEfekti(k.x,k.y,18,"#7cf5c0",90); }
-        else { r.yakit=Math.min(TEMEL.yakit, r.yakit+15); patlamaEfekti(k.x,k.y,18,"#f5d97c",90); } } }
+        if (k.tur==="yakit") { r.yakit=Math.min(TEMEL.yakit, r.yakit+30); patlamaEfekti(k.x,k.y,18,"#7cf5c0",90); }
+        else { r.fuzeSayi=Math.min(6, r.fuzeSayi+1); patlamaEfekti(k.x,k.y,18,"#ff9a4d",90);   // 2P: +1 fuze (friendly fire canli kalsin)
+          bildirim = { metin:`${P_RENK[r.no].ad} +1 FUZE`, omur:1.0 }; } } }
     kapsuller = kapsuller.filter(k => k.canli);
     // gezegen teması: hedefe inis / kalkistan yumusak temas / carpma
     let bitti = false;
@@ -1662,9 +1678,15 @@ function guncelleIkili(dt) {
     if (bitti) continue;
   }
 
-  // olen ama caniolan roketleri kalkistan dirilt (bekleyenler haric)
+  // olen ama caniolan roketleri dirilt: uydu varsa oradan, yoksa kalkistan (bekleyenler haric)
   const b = basGez();
-  for (const r of roketler) if (!r.canli && !r.elenme && !r.indi && b) ikiliKonumla(r, b);
+  for (const r of roketler) {
+    if (r.canli || r.elenme || r.indi) continue;
+    if (r.uyduNokta) {   // uydudan diril (kontrol noktasi tuketilir)
+      r.x = r.uyduNokta.x; r.y = r.uyduNokta.y; r.aci = r.uyduNokta.aci; r.vx = r.vy = 0;
+      r.yakit = Math.max(r.yakit, r.uyduNokta.yakit); r.canli = true; r.ayak = 1; r.koruma = 1.4; r.iz = []; r.uyduNokta = null;
+    } else if (b) ikiliKonumla(r, b);
+  }
 
   if (roketler.every(r => r.elenme)) {   // herkes elendi -> oyun biter
     durum = "bitti2p";
@@ -1708,6 +1730,13 @@ function ikiliCiz() {
   ctx.shadowBlur = 5;
   for (const p of parcalar) { ctx.globalAlpha=Math.max(0,Math.min(1,p.omur*2)); ctx.shadowColor=p.renk||"#fff"; ctx.fillStyle=p.renk||"#fff"; ctx.fillRect(p.x-1.4,p.y-1.4,2.8,2.8); }
   ctx.globalAlpha = 1;
+  for (const r of roketler) if (r.uyduNokta) {   // birakilmis kontrol noktalari
+    ctx.save(); ctx.strokeStyle = P_RENK[r.no].ana; ctx.globalAlpha = 0.8; ctx.lineWidth = 1.6/kam.s;
+    const s = 9, u = r.uyduNokta;
+    ctx.beginPath(); ctx.moveTo(u.x, u.y-s); ctx.lineTo(u.x+s, u.y); ctx.lineTo(u.x, u.y+s); ctx.lineTo(u.x-s, u.y); ctx.closePath(); ctx.stroke();
+    ctx.globalAlpha = 0.3; ctx.beginPath(); ctx.arc(u.x, u.y, s+5, 0, 6.2832); ctx.stroke();
+    ctx.globalAlpha = 1; ctx.restore();
+  }
   for (const r of roketler) {
     if (r.elenme || !r.canli) continue;
     if (r.koruma > 0 && Math.floor(r.koruma*10)%2) continue;   // dirilis yanip sonmesi
@@ -1741,9 +1770,10 @@ function ikiliArayuz() {
     ctx.fillStyle="#8a8a8a"; ctx.font="13px ui-monospace, monospace"; ctx.fillText("YKT", x, 74);
     pilCiz(x+34, 63, 90, 12, r.yakit/TEMEL.yakit, r.yakit<TEMEL.yakit*0.25?"#ff5c4d":"#7cf5c0");
     ctx.fillStyle="#ff9a4d"; ctx.font="12px ui-monospace, monospace"; ctx.fillText(`FUZE ${r.fuzeSayi}`, x, 92);
+    ctx.fillStyle="#8ad4ff"; ctx.fillText(`UYDU ${r.uydu}` + (r.uyduNokta?" ▸ AKTIF":""), x+80, 92);
     ctx.fillStyle="#6a6a6a"; ctx.font="10px ui-monospace, monospace";   // tuslar (yonerge okumadan gorunsun)
-    ctx.fillText(r.no===0 ? "← → don  ↑ gaz  SAG SHIFT ates"
-                          : "A D don  W gaz  SOL SHIFT ates", x, 108);
+    ctx.fillText(r.no===0 ? "← → don · ↑ gaz · SAG SHIFT ates · . uydu"
+                          : "A D don · W gaz · SOL SHIFT ates · Q uydu", x, 108);
   };
   if (roketler[0]) panel(roketler[0], false);
   if (roketler[1]) panel(roketler[1], true);
