@@ -1,6 +1,8 @@
 # ROKET
 
-**Sürüm: v2.5** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md).
+**Sürüm: v2.6** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md).
+
+**Oyna:** https://asturker90.github.io/roket/ (her `main` güncellemesinde otomatik yayınlanır)
 
 Yerçekimi tabanlı bir uzay yolculuğu oyunu. Tek HTML dosyası, bağımlılık yok, çevrimdışı çalışır.
 
@@ -113,7 +115,8 @@ Başlangıç ekranında **2** tuşuna basınca iki kişilik mod başlar (tek kla
 
 - **Mavi (P1):** ← → dön, ↑ gaz, **Sağ Shift** ateş. (ya da 1. gamepad)
 - **Turuncu (P2):** A D dön, W gaz, **Sol Shift** ateş. (ya da 2. gamepad)
-- İkiniz de mavi gezegenden başlarsınız. **İlk hedefe inen bölümü açar**, ikiniz de bir sonraki bölüme geçersiniz — "gidebildiğin kadar git".
+- İkiniz de mavi gezegenden başlarsınız. **Bir sonraki bölüme geçmek için ikinizin de hedefe inmesi gerekir** — önce inen, hedefte halkayla işaretlenip diğerini bekler ("INDI ▸ BEKLIYOR"). İkiniz de inince birlikte ilerlersiniz — "gidebildiğin kadar git". (Biri elenirse diğeri tek başına inerek ilerler.)
+- Her oyuncunun kullandığı tuşlar ekranda kendi panelinde yazılıdır.
 - Her oyuncunun kendi yakıtı ve **3 kalbi** vardır (yakıt kapsüllerden dolar). Bir ölüm bir kalp götürür; kalbin varken bölümün başından dirilirsin (kısa dokunulmazlıkla). **Üç kalbin de biterse elenirsin**, rakibin tek başına devam eder.
 - **Friendly fire:** füzen rakibin roketini vurursa ona bir kalp kaybettirir (kendi füzen sana zarar vermez).
 - İkiniz de elendiğinizde oyun biter; **en uzağa giden (son elenen) kazanır.** Kazanan ekranında **2** ile tekrar, **1** ile tek kişiliğe dönersin.
