@@ -19,18 +19,21 @@
   .hud:active { background:rgba(255,255,255,0.18); }
   #btnYeni { right:calc(50% + 5px); }
   #btnTam  { left:calc(50% + 5px); }
+  #btn2p   { top:48px; left:50%; transform:translateX(-50%);
+    background:rgba(92,200,255,0.18); border-color:rgba(92,200,255,0.65); color:#bfe6ff; }
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
 <button id="btnYeni" class="hud">&#8635; BA&#350;TAN</button>
 <button id="btnTam" class="hud">&#9214; TAM EKRAN</button>
+<button id="btn2p" class="hud">&#128101; 2 K&#304;&#350;&#304;L&#304;K</button>
 <script>
 "use strict";
 
 /* ===================== EKRAN ===================== */
 const W = 1200, H = 800;
-const SURUM = "v2.7";
+const SURUM = "v2.8";
 document.title = `ROKET ${SURUM} — YOLCULUK`;
 const cvs = document.getElementById("c");
 const ctx = cvs.getContext("2d");
@@ -372,6 +375,7 @@ addEventListener("keydown", e => {
   if (e.key === "2" && !e.repeat && (durum === "hazir" || durum === "bitti2p")) { ikiliBasla(); return; }
   if (e.key === "1" && !e.repeat && durum === "bitti2p") { ikili = false; yenidenBasla(); return; }
   if (ikili) {   // 2P: sadece oyun kontrolleri
+    if (durum === "ikiliHazir") { if (!e.repeat) durum = "ucus"; return; }   // hazir ekranindan basla
     if (!e.repeat && durum === "ucus") {
       if (e.code === "Period") ikiliUyduBirak(0);   // P1 uydu
       if (e.code === "KeyQ")   ikiliUyduBirak(1);   // P2 uydu
@@ -411,6 +415,11 @@ cvs.addEventListener("pointerdown", e => {
   cvs.setPointerCapture?.(e.pointerId);
   const l = yerel(e.clientX, e.clientY);
   isaretler.set(e.pointerId, l);
+  if (ikili) {   // 2P: hazir ekranindan basla / bitti ekranindan tekrar
+    if (durum === "ikiliHazir") durum = "ucus";
+    else if (durum === "bitti2p") ikiliBasla();
+    return;
+  }
   if (durum === "dukkan") { dukkanDokun(l); return; }
   if (durum === "ucus") {
     if (!kolBagli && joyId === null && joyBolgesinde(l)) { joyId = e.pointerId; joyGuncelle(l); return; }
@@ -444,6 +453,7 @@ document.getElementById("btnYeni").addEventListener("click", () => {
   if (ikili) ikiliBasla();
   else if (durum !== "dukkan") yenidenBasla();
 });
+document.getElementById("btn2p").addEventListener("click", () => { if (durum !== "dukkan") ikiliBasla(); });
 
 let kolGecmis = { a:false, b:false, yukari:false, asagi:false, start:false, y:false };
 function kolOku() {
@@ -1322,7 +1332,7 @@ function arayuz() {
     if (etap >= 16)          s.push(`UFO tehlikesi: haritada belirir, ${ufoAtisSayisi()} fuze atar — kacin ya da fuzeyle vur (+150)`);
     if (uyduSayi > 0)        s.push("UYDU birak (C / ekran tusu): olursen oradan devam edersin");
     if (bedavaIkmal)         s.push("Acil yakit ikmali yapildi (45)");
-    if (etap === 1)          s.push("2 = IKI KISILIK ayni ekran  (P1: oklar + Sag Shift · P2: WASD + Sol Shift)");
+    if (etap === 1)          s.push("Ustteki '2 KISILIK' butonu (ya da 2 tusu) = ayni ekran iki kisilik");
     kutu(etap === 1 ? "YOLCULUK BASLIYOR" : `${etap}. SICRAMA — ${blokAdi()}`, s, "DOKUN / ENTER");
   } else if (durum === "patladi") {
     kutu(mesaj, [`Sure ${sure.toFixed(1)} sn`,
@@ -1495,6 +1505,7 @@ function ikiliBasla() {
   roketler = [ikiliRoketYap(0), ikiliRoketYap(1)];
   kam.ilk = true;
   ikiliEtapKur();
+  durum = "ikiliHazir";   // once kontrolleri goster, dokun/enter ile basla
 }
 function ikiliSonrakiEtap(inenId) {   // bir roket hedefe indi: herkes birlikte ilerler
   for (const g of gezegenler) { g.baslangic = false; g.hedef = false; }
@@ -1532,7 +1543,7 @@ function ikiliPadOku(no) {   // gamepad no -> P(no) girdisi
 }
 
 function guncelleIkili(dt) {
-  if (durum === "bitti2p") return;
+  if (durum === "bitti2p" || durum === "ikiliHazir") return;
   if (sarsinti > 0) sarsinti = Math.max(0, sarsinti - dt*26);
   if (durum === "ucus") sure += dt;
   if (bildirim) { bildirim.omur -= dt; if (bildirim.omur <= 0) bildirim = null; }
@@ -1759,7 +1770,7 @@ function ikiliArayuz() {
     ctx.fillText(bildirim.metin, W/2, 150); ctx.shadowBlur=0; ctx.globalAlpha=1; ctx.textAlign="left";
   }
   ctx.textAlign="center"; ctx.font="13px ui-monospace, monospace"; ctx.fillStyle="#8a8a8a";
-  ctx.fillText(`${etap}. BOLUM — ${blokAdi()}`, W/2, 64);
+  ctx.fillText(`${etap}. BOLUM — ${blokAdi()}`, W/2, H-16);
   // iki oyuncu paneli (sol=P1, sag=P2)
   const panel = (r, sag) => {
     const x = sag ? W-210 : 20;
@@ -1778,10 +1789,19 @@ function ikiliArayuz() {
   if (roketler[0]) panel(roketler[0], false);
   if (roketler[1]) panel(roketler[1], true);
 
-  if (durum === "bitti2p") {
+  if (durum === "ikiliHazir") {
+    kutu("IKI KISILIK", [
+      "MAVI (P1):   ← → don  ·  ↑ gaz  ·  SAG SHIFT ates  ·  .  uydu",
+      "TURUNCU (P2):   A D don  ·  W gaz  ·  SOL SHIFT ates  ·  Q uydu",
+      "",
+      "Ikiniz de yesil hedefe inince birlikte sonraki bolume gecersiniz",
+      "Friendly fire ACIK — birbirinizi vurabilirsiniz; en uzaga giden kazanir",
+      "Klavye ya da 2 gamepad gerekir (tek telefonda oynanmaz)",
+    ], "BASLAMAK ICIN DOKUN / ENTER", "#5cc8ff");
+  } else if (durum === "bitti2p") {
     const kz = kazanan === null ? "BERABERE" : `${P_RENK[kazanan].ad} KAZANDI`;
     kutu("OYUN BITTI", [kz, `Mavi ${roketler[0].enEtap}. bolum · Turuncu ${roketler[1].enEtap}. bolum`,
-      "2 = tekrar iki kisilik · 1 = tek kisilik"], "2 / 1", kazanan===null?"#f5d97c":P_RENK[kazanan].ana);
+      "Dokun = tekrar · (2 = iki kisilik · 1 = tek kisilik)"], "DOKUN / 2 / 1", kazanan===null?"#f5d97c":P_RENK[kazanan].ana);
   }
 }
 

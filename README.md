@@ -1,6 +1,6 @@
 # ROKET
 
-**Sürüm: v2.7** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md).
+**Sürüm: v2.8** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md).
 
 **Oyna:** https://asturker90.github.io/roket/ (her `main` güncellemesinde otomatik yayınlanır)
 
@@ -111,7 +111,7 @@ Kol bağlandığında ekran tuşları otomatik kaybolur.
 
 ## İki kişilik (yerel, aynı ekran)
 
-Başlangıç ekranında **2** tuşuna basınca iki kişilik mod başlar (tek klavyede ya da iki gamepad ile). Bu bir **co-opetition**: birlikte ilerlersiniz ama en uzağa giden kazanır ve **birbirinizi vurabilirsiniz** (friendly fire açık).
+Ekranın üstündeki **"👥 2 KİŞİLİK"** butonuna (ya da **2** tuşuna) basınca iki kişilik mod başlar. Önce **kontrolleri gösteren bir hazırlık ekranı** çıkar; dokun ya da Enter ile başlarsın. **Klavye ya da iki gamepad gerekir** — tek telefon dokunmatiğinde iki roket birden kontrol edilemez. Bu bir **co-opetition**: birlikte ilerlersiniz ama en uzağa giden kazanır ve **birbirinizi vurabilirsiniz** (friendly fire açık).
 
 - **Mavi (P1):** ← → dön, ↑ gaz, **Sağ Shift** ateş, **.** uydu bırak. (ya da 1. gamepad)
 - **Turuncu (P2):** A D dön, W gaz, **Sol Shift** ateş, **Q** uydu bırak. (ya da 2. gamepad)
