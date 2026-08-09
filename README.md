@@ -1,6 +1,6 @@
 # ROKET
 
-**Sürüm: v2.3** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md).
+**Sürüm: v2.4** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md).
 
 Yerçekimi tabanlı bir uzay yolculuğu oyunu. Tek HTML dosyası, bağımlılık yok, çevrimdışı çalışır.
 
@@ -78,19 +78,19 @@ Bir uyarı ("UFO YAKLASIYOR") gelir. İki seçeneğin var: **kaç** (füzeleri s
 
 ## Tersane
 
-Her inişten sonra açılır. En sık kullanılan **sarf malzemeleri (yakıt/füze/uydu ikmali) listenin en üstündedir**; altında altı kalıcı yükseltme, en altta bir sonraki sıçramaya geçiş vardır. Üst şeritte altın-coin ile kredin ve pil gibi dolan bir **yakıt göstergesi** (sayı + bar) durur.
+Her inişten sonra açılır. En sık kullanılan **sarf malzemeleri (yakıt ikmali, füze, can, uydu) listenin en üstündedir**; altında altı kalıcı yükseltme, en altta bir sonraki sıçramaya geçiş vardır. Üst şeritte kalplerin (can), altın-coin ile kredin ve pil gibi dolan bir **yakıt göstergesi** (sayı + bar) durur.
 
 Yükseltmelerin hepsi 5 seviyeye çıkar; **yakıt tankı ise 10 seviyeye** kadar. **Motor** itkiyi %14 artırır ama yakıt tüketimini %20 artırır — net kazanç değil, bir tercih. **Füze rampası** kapasiteyi 2 artırır ve dolu gelir. **Kalkan** her seviyede bir yük ekler; her sıçrama başında dolar ve bir göktaşı ya da kara delik çarpmasını emerek seni kurtarır (kara delikte acil fırlatma yapar). İniş hatalarını engellemez — beceri hâlâ sende.
 
-## Ölüm ve strateji
+## Can (kalp) ve ölüm
 
-**Ölürsen en baştan başlarsın.** Roketin patlarsa oyun tamamen sıfırlanır: **1. bölüm, sıfır kredi, sıfır yükseltme.** Bu yüzden her sıçrama önemlidir — yakıt yönetimi, doğru açı, ne zaman risk alacağın hepsi sayar. Tek istisna: aşağıdaki **uydu**.
+**3 kalple** başlarsın (HUD'da sol üstte kırmızı kalpler). Roketin her patladığında **bir kalp gider** ve o sıçramayı tekrarlarsın (uydu bıraktıysan uydudan — aşağıya bak). Paran, yükseltmelerin ve bölümün durur. Ama **üç kalbi de bitirirsen oyun tamamen sıfırlanır**: 1. bölüm, sıfır kredi, sıfır yükseltme. Bu yüzden her sıçrama önemlidir — dikkat ve strateji sayar.
 
-Ekrandaki **BAŞTAN** tuşu da oyunu bilerek en baştan başlatır (sıçrama tekrarı değildir).
+Kalp, Tersane'den **pahalıya** (500 kredi) satın alınabilir; en fazla 5 kalp taşırsın. Ekrandaki **BAŞTAN** tuşu oyunu bilerek en baştan başlatır (sıçrama tekrarı değildir).
 
-## Uydu (kontrol noktası — tek can simidin)
+## Uydu (kontrol noktası)
 
-Ölünce baştan başladığın için **uydu** senin tek sigortandır. Tersane'den satın aldığın bir sarf malzemesidir (en fazla 5 taşırsın). Uçarken istediğin anda bir tuşla bırakırsın; o anki durum kaydedilir. **Ölürsen en baştan değil, uydunun olduğu yerden devam edersin** — paran ve yükseltmelerin korunur. Zor bir geçitten (kara delik, UFO) hemen önce bırakmak en mantıklısı. Bıraktığın uydu o sıçrama boyunca geçerlidir; başarıyla inince (yeni sıçrama) ya da **BAŞTAN** dersen iptal olur.
+Ölünce sıçramanın en başına dönmemek için **uydu** bırakabilirsin. Tersane'den satın aldığın bir sarf malzemesidir; **aynı anda yalnızca 1 taşırsın** (kullandıktan sonra tekrar alırsın), fiyatı 260 kredi. Uçarken istediğin anda bir tuşla bırakırsın; o anki durum kaydedilir. **Ölürsen (kalbin varken) sıçramanın başına değil, uydunun olduğu yerden devam edersin.** Zor bir geçitten (kara delik, UFO) hemen önce bırakmak en mantıklısı. Bıraktığın uydu o sıçrama boyunca geçerlidir; başarıyla inince (yeni sıçrama) ya da **BAŞTAN** dersen iptal olur.
 
 ## Kontroller
 

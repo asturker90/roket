@@ -3,6 +3,22 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada tutulur.
 Sürümleme kabaca [SemVer](https://semver.org/lang/tr/) mantığını izler.
 
+## [v2.4] — 2026-08-09
+
+### Eklendi (can / kalp sistemi)
+- **3 kalple başlanır**; her ölüm bir kalp götürür ve sıçrama tekrarlanır (uydu varsa uydudan).
+  **Üç kalp de biterse** oyun tamamen sıfırlanır (1. bölüm, sıfır para/yükseltme).
+- Kalp Tersane'den **pahalıya (500)** satın alınabilir; en fazla 5 taşınır.
+- HUD sol üstte ve Tersane üst şeridinde **kalp göstergesi** (dolu/boş); CAN satırında da mevcut kalpler.
+- Kalp çizimi için `kalpCiz()` yardımcısı eklendi.
+
+### Değiştirildi
+- **Uydu artık aynı anda 1 taşınır** (önce 5); fiyatı 130 → **260**. Kullanınca yeniden alınır.
+- Ölüm artık doğrudan "en baştan" değil, **kalp bitince** en baştan (v2.3'teki sert kural yumuşatıldı,
+  kullanıcı isteğiyle can sistemine bağlandı).
+- Ölüm ekranı mesajı kalp durumuna göre güncellendi ("N can kaldi" / "TUM CANLAR BITTI — EN BASTAN").
+- Tersane 11 satıra göre yeniden aralıklandı (CAN satırı eklendiği için).
+
 ## [v2.3] — 2026-08-09
 
 ### Değiştirildi (ölüm artık kalıcı — dikkat & strateji)
