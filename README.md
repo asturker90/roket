@@ -1,6 +1,6 @@
 # ROKET
 
-**Sürüm: v2.6** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md).
+**Sürüm: v2.7** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md).
 
 **Oyna:** https://asturker90.github.io/roket/ (her `main` güncellemesinde otomatik yayınlanır)
 
@@ -113,12 +113,13 @@ Kol bağlandığında ekran tuşları otomatik kaybolur.
 
 Başlangıç ekranında **2** tuşuna basınca iki kişilik mod başlar (tek klavyede ya da iki gamepad ile). Bu bir **co-opetition**: birlikte ilerlersiniz ama en uzağa giden kazanır ve **birbirinizi vurabilirsiniz** (friendly fire açık).
 
-- **Mavi (P1):** ← → dön, ↑ gaz, **Sağ Shift** ateş. (ya da 1. gamepad)
-- **Turuncu (P2):** A D dön, W gaz, **Sol Shift** ateş. (ya da 2. gamepad)
+- **Mavi (P1):** ← → dön, ↑ gaz, **Sağ Shift** ateş, **.** uydu bırak. (ya da 1. gamepad)
+- **Turuncu (P2):** A D dön, W gaz, **Sol Shift** ateş, **Q** uydu bırak. (ya da 2. gamepad)
 - İkiniz de mavi gezegenden başlarsınız. **Bir sonraki bölüme geçmek için ikinizin de hedefe inmesi gerekir** — önce inen, hedefte halkayla işaretlenip diğerini bekler ("INDI ▸ BEKLIYOR"). İkiniz de inince birlikte ilerlersiniz — "gidebildiğin kadar git". (Biri elenirse diğeri tek başına inerek ilerler.)
 - Her oyuncunun kullandığı tuşlar ekranda kendi panelinde yazılıdır.
 - Her oyuncunun kendi yakıtı ve **3 kalbi** vardır (yakıt kapsüllerden dolar). Bir ölüm bir kalp götürür; kalbin varken bölümün başından dirilirsin (kısa dokunulmazlıkla). **Üç kalbin de biterse elenirsin**, rakibin tek başına devam eder.
-- **Friendly fire:** füzen rakibin roketini vurursa ona bir kalp kaybettirir (kendi füzen sana zarar vermez).
+- **Friendly fire:** füzen rakibin roketini vurursa ona bir kalp kaybettirir (kendi füzen sana zarar vermez). Füzen biterse **sarı kapsüller +1 füze** verir (yeşil kapsül yakıt) — böylece düello sürebilir.
+- **Uydu (kontrol noktası):** her oyuncunun bölüm başına **1 uydu**su vardır; kendi tuşuyla bırakır (P1 `.` / P2 `Q`). Ölürsen bölüm başından değil, uydunun olduğu yerden devam edersin (uydu o kullanımda biter). Zor bir geçitten önce bırakmak akıllıca.
 - İkiniz de elendiğinizde oyun biter; **en uzağa giden (son elenen) kazanır.** Kazanan ekranında **2** ile tekrar, **1** ile tek kişiliğe dönersin.
 - İki kişilik mod arcade'dir: tersane/yükseltme yoktur, herkes temel roketle oynar. (Online sürüm ileride.)
 
