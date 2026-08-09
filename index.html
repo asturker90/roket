@@ -30,7 +30,7 @@
 
 /* ===================== EKRAN ===================== */
 const W = 1200, H = 800;
-const SURUM = "v2.0";
+const SURUM = "v2.1";
 document.title = `ROKET ${SURUM} — YOLCULUK`;
 const cvs = document.getElementById("c");
 const ctx = cvs.getContext("2d");
@@ -105,6 +105,16 @@ function gezegenYap(x, y, r, m) {
            hedef:false, baslangic:false, kurtarma:false, mekik:null, faz:Math.random()*6.28 };
 }
 
+// UFO atis sayisi bloga gore kademeli: 16-20 -> 3, 21-25 -> 4, 26+ -> 5 (once yok)
+const ufoAtisSayisi = () => etap < 16 ? 0 : (etap < 21 ? 3 : (etap < 26 ? 4 : 5));
+function blokAdi() {
+  if (etap <= 5)  return "TEMELLER";
+  if (etap <= 10) return "KURTARMA";
+  if (etap <= 15) return "USTALIK";
+  if (etap <= 20) return "TEHLIKE BOLGESI";
+  return "SONSUZ";
+}
+
 /* Verilen dogrultuda, mevcut gezegen ve kara deliklerden yeterince uzak bir yer
    bulmaya calisir. Bulamazsa null doner (o nesne o sicramada atlanir). */
 function yerAra(bazX, bazY, dik, sapMin, sapGen, r, boslukGez, boslukKara) {
@@ -130,8 +140,8 @@ function hedefUret() {
   h.hedef = true;
   gezegenler.push(h);
 
-  // ara kutle (yercekimi tuzagi) — 3. etaptan sonra
-  if (etap >= 3 && Math.random() < 0.55) {
+  // ara kutle (yercekimi) — Blok 2'den itibaren (6+), sonraki bloklarda daha sik
+  if (etap >= 6 && Math.random() < (etap >= 11 ? 0.6 : 0.4)) {
     const t = 0.42 + Math.random()*0.16;
     const px = b.x + (hx-b.x)*t, py = b.y + (hy-b.y)*t;
     const r = 62 + Math.random()*30;
@@ -139,8 +149,8 @@ function hedefUret() {
     if (yer) gezegenler.push(gezegenYap(yer.x, yer.y, r, 1.6 + Math.random()*0.8));
   }
 
-  // kurtarma gezegeni: uzerinde mahsur mekik — yakit ver, kurtar, bol para al (opsiyonel durak)
-  if (etap >= 2 && Math.random() < 0.45) {
+  // kurtarma gezegeni: mahsur mekik — Blok 2 (6-10) temasi, sonra ara ara devam
+  if (etap >= 6 && Math.random() < (etap <= 10 ? 0.6 : 0.35)) {
     const t = 0.40 + Math.random()*0.20;
     const px = b.x + (hx-b.x)*t, py = b.y + (hy-b.y)*t;
     const r = 58 + Math.random()*20;
@@ -153,8 +163,8 @@ function hedefUret() {
     }
   }
 
-  // goktaslari
-  const adet = Math.min(1 + Math.floor(etap/1.4), 5);
+  // goktaslari — blok egrisi boyunca yumusakca artar (1-2 -> 4-5)
+  const adet = Math.min(1 + Math.floor((etap-1)/4), 5);
   for (let i = 0; i < adet; i++) {
     const t = 0.25 + Math.random()*0.5;
     const px = b.x + (hx-b.x)*t, py = b.y + (hy-b.y)*t;
@@ -166,9 +176,9 @@ function hedefUret() {
       r:18 + Math.random()*13, faz:Math.random()*6.28, canli:true, merkezX:px, merkezY:py });
   }
 
-  // kara delik (yercekimi tuzagi / sapan) — 4. etaptan sonra
+  // kara delik — Blok 4 (16-20) "tehlike bolgesi" temasi, sonra da devam
   // en son uretilir; tum gezegenlerden acikca uzak bir yere konur (yoksa atlanir)
-  if (etap >= 4 && Math.random() < 0.5) {
+  if (etap >= 16 && Math.random() < 0.5) {
     const t = 0.40 + Math.random()*0.22;
     const px = b.x + (hx-b.x)*t, py = b.y + (hy-b.y)*t;
     const r = 27 + Math.random()*9;
@@ -224,7 +234,7 @@ function anlikGeriYukle(k, uyduMu) {
   yakit = k.yakit; fuzeSayi = k.fuzeSayi; kalkan = k.kalkan; para = k.para; yon = k.yon;
   parcalar = []; iz = []; fuzeler = []; gidenMekikler = []; bildirim = null;
   ufo = null; dusmanFuzeler = [];
-  ufoTimer = etap >= 20 ? 2.5 + Math.random()*4.5 : -1;   // dirilince UFO yeniden gelir
+  ufoTimer = etap >= 16 ? 2.5 + Math.random()*4.5 : -1;   // dirilince UFO yeniden gelir
   atisSayac = 0; sarsinti = 0; mesaj = null;
   if (uyduMu) {   // uydudan diril: yerinde, durgun, hemen kontrol sende
     roket.vx = roket.vy = 0; roket.canli = true; durum = "ucus"; sure = k.sure;
@@ -256,7 +266,7 @@ function etapBaslat() {
   sure = 0; durum = "hazir"; mesaj = null;
   parcalar = []; iz = []; fuzeler = []; gidenMekikler = []; bildirim = null;
   ufo = null; dusmanFuzeler = [];
-  ufoTimer = etap >= 20 ? 2.5 + Math.random()*4.5 : -1;   // 20. etaptan sonra UFO gelir
+  ufoTimer = etap >= 16 ? 2.5 + Math.random()*4.5 : -1;   // Blok 4'ten (16+) UFO gelir
 }
 
 function yenidenBasla() {
@@ -551,7 +561,7 @@ function ufoCagir() {   // rastgele bir kenardan girer, haritayi caprazlar, 3 fu
   ufo = { x: cx + Math.cos(a)*R + Math.cos(perp)*off,
           y: cy + Math.sin(a)*R + Math.sin(perp)*off,
           vx: -Math.cos(a)*hiz, vy: -Math.sin(a)*hiz,
-          atisKalan: 3, atisSayac: 2.4 + Math.random()*0.8, faz: 0, omur: (2*R)/hiz + 1 };
+          atisKalan: ufoAtisSayisi(), atisSayac: 2.4 + Math.random()*0.8, faz: 0, omur: (2*R)/hiz + 1 };
   bildirim = { metin:"! UFO YAKLASIYOR !", omur:2.2 };
   sarsinti = Math.max(sarsinti, 4);
 }
@@ -1252,10 +1262,10 @@ function arayuz() {
     if (kapsuller.length)    s.push("Kapsulleri topla — F: +yakit, $: +kredi");
     if (karaDelikler.length) s.push("Kara delige dikkat: cekimi guclu, olay ufku olduruyor");
     if (gezegenler.some(g=>g.kurtarma)) s.push("Sari gezegende mahsur mekik var — duzgun in, yakit ver, kurtar, bol para al");
-    if (etap >= 20)          s.push("UFO tehlikesi: haritada belirir, 3 fuze atar — kacin ya da fuzeyle vur (+150)");
+    if (etap >= 16)          s.push(`UFO tehlikesi: haritada belirir, ${ufoAtisSayisi()} fuze atar — kacin ya da fuzeyle vur (+150)`);
     if (uyduSayi > 0)        s.push("UYDU birak (C / ekran tusu): olursen oradan devam edersin");
     if (bedavaIkmal)         s.push("Acil yakit ikmali yapildi (45)");
-    kutu(etap === 1 ? "YOLCULUK BASLIYOR" : `${etap}. SICRAMA`, s, "DOKUN / ENTER");
+    kutu(etap === 1 ? "YOLCULUK BASLIYOR" : `${etap}. SICRAMA — ${blokAdi()}`, s, "DOKUN / ENTER");
   } else if (durum === "patladi") {
     kutu(mesaj, [`Sure ${sure.toFixed(1)} sn`, uyduKayit ? "Birakilan uyduya donuluyor" : "Sicrama basina donuluyor"],
          "TEKRAR ICIN DOKUN", "#ff5c4d");

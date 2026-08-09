@@ -3,6 +3,19 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada tutulur.
 Sürümleme kabaca [SemVer](https://semver.org/lang/tr/) mantığını izler.
 
+## [v2.1] — 2026-08-07
+
+### Değiştirildi (bölüm/zorluk yapısı — Aşama 1)
+- Mekanikler 5'erli tematik bloklara oturtuldu, zorluk eğrisi katmanlı yükseliyor:
+  - **1-5 Temeller**: sadece iniş + az göktaşı (kurtarma/ara kütle/kara delik yok).
+  - **6-10 Kurtarma**: sarı kurtarma gezegeni ve ara kütleler bu bloktan başlar.
+  - **11-15 Ustalık**: ara kütle sıklaşır, göktaşı yoğunlaşır.
+  - **16-20 Tehlike Bölgesi**: kara delik artık buradan (önce 4'ten) başlar; UFO buradan (önce 20'den) belirir.
+  - **20+ Sonsuz**: her şey birlikte.
+- **UFO atışı kademeli**: 16-20 → 3, 21-25 → 4, 26+ → 5 füze (`ufoAtisSayisi()`).
+- Göktaşı sayısı daha yumuşak eğriyle artar (1-2 → 4-5).
+- Başlangıç ekranında sıçrama başlığına blok adı eklendi (ör. "8. SICRAMA — KURTARMA").
+
 ## [v2.0] — 2026-08-07
 
 ### Değiştirildi (dokunmatik kontrol elden geçirildi)

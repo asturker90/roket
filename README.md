@@ -1,10 +1,22 @@
 # ROKET
 
-**Sürüm: v2.0** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md).
+**Sürüm: v2.1** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md).
 
 Yerçekimi tabanlı bir uzay yolculuğu oyunu. Tek HTML dosyası, bağımlılık yok, çevrimdışı çalışır.
 
 Bir gezegenden kalkıp bir sonrakine iniyorsun. İndiğin gezegen, bir sonraki sıçramanın kalkış noktası oluyor — bölümler ayrı sahneler değil, tek bir kesintisiz yolculuk.
+
+## Bölümler ve zorluk eğrisi
+
+Yolculuk 5'erli tematik bloklara ayrılır; her blok yeni bir zorluk ekler, öncekiler azalarak devam eder (katmanlı zorluk). Başlangıç ekranında sıçrama numarasının yanında bloğun adı yazar.
+
+| Bölüm | Tema | Ne çıkar |
+|---|---|---|
+| **1-5 · TEMELLER** | Temiz iniş öğrenme | Az göktaşı, başka tehlike yok |
+| **6-10 · KURTARMA** | İkmal/kurtarma | Sarı kurtarma gezegeni (mahsur mekik) + ara kütleler, daha çok göktaşı |
+| **11-15 · USTALIK** | Yoğun seyrüsefer | Ara kütleler sıkça, göktaşı yoğunluğu artar |
+| **16-20 · TEHLİKE BÖLGESİ** | Kara delik + UFO | Kara delik çıkar; UFO belirir (16-20: 3 füze) |
+| **20+ · SONSUZ** | Her şey birlikte | Tüm tehlikeler; UFO atışı 21-25: 4, 26+: 5'e çıkar |
 
 ## Oynanış
 
