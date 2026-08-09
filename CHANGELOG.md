@@ -3,6 +3,15 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada tutulur.
 Sürümleme kabaca [SemVer](https://semver.org/lang/tr/) mantığını izler.
 
+## [v2.9] — 2026-08-09
+
+### Eklendi (duyuru/paylaşım hazırlığı)
+- **Open Graph / Twitter Card meta etiketleri**: bağlantı paylaşıldığında (WhatsApp, X,
+  Telegram vb.) başlık, açıklama ve önizleme görseli düzgün çıkar.
+- **Önizleme görseli** `og.png` (1200×630) eklendi.
+- Emoji favicon (🚀), açıklama ve tema rengi meta etiketleri.
+- README bir "vitrin" gibi düzenlendi (görsel + belirgin OYNA butonu).
+
 ## [v2.8] — 2026-08-09
 
 ### Eklendi (2 kişilik keşfedilebilirlik)

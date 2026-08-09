@@ -1,10 +1,14 @@
-# ROKET
+# 🚀 ROKET — Yörünge Yolculuğu
 
-**Sürüm: v2.8** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md).
+### ▶️ [OYNA (ücretsiz, tarayıcıda)](https://asturker90.github.io/roket/)
 
-**Oyna:** https://asturker90.github.io/roket/ (her `main` güncellemesinde otomatik yayınlanır)
+![ROKET oyun görseli](og.png)
 
-Yerçekimi tabanlı bir uzay yolculuğu oyunu. Tek HTML dosyası, bağımlılık yok, çevrimdışı çalışır.
+Yerçekimiyle dans et, gezegenden gezegene in, **gidebildiğin kadar git**. Göktaşları, kara delikler ve UFO'lar arasında hayatta kal. **Tek kişilik sonsuz yolculuk** + **aynı ekran 2 kişilik düello** (friendly fire açık).
+
+Tek HTML dosyası — bağımlılık yok, kurulum yok, çevrimdışı da çalışır.
+
+**Sürüm: v2.9** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md). · **Oyna:** https://asturker90.github.io/roket/ (her `main` güncellemesinde otomatik yayınlanır)
 
 Bir gezegenden kalkıp bir sonrakine iniyorsun. İndiğin gezegen, bir sonraki sıçramanın kalkış noktası oluyor — bölümler ayrı sahneler değil, tek bir kesintisiz yolculuk.
 
