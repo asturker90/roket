@@ -1,6 +1,6 @@
 # ROKET
 
-**Sürüm: v1.9** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md).
+**Sürüm: v2.0** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md).
 
 Yerçekimi tabanlı bir uzay yolculuğu oyunu. Tek HTML dosyası, bağımlılık yok, çevrimdışı çalışır.
 
@@ -80,14 +80,14 @@ Tersane'den satın aldığın bir sarf malzemesidir (en fazla 3 taşırsın). U�
 
 | | Kol | Klavye | Dokunmatik |
 |---|---|---|---|
-| Dönüş | Sol çubuk / D-pad | ← → veya A D | Sol alttaki tuşlar |
-| İtki | A veya RT | ↑ veya W veya Boşluk | Sağ alttaki ▲ |
-| Füze | B | X | Sağ alttaki FÜZE |
-| Uydu bırak | Y / Üçgen | C | Sağ alttaki UYDU |
+| Dönüş | Sol çubuk / D-pad | ← → veya A D | **Sol analog joystick** (sağa/sola çek) |
+| İtki | A veya RT | ↑ veya W veya Boşluk | **Sağdaki büyük gaz tuşu** ▲ |
+| Füze | B | X | Gazın yanındaki FÜZE |
+| Uydu bırak | Y / Üçgen | C | Gazın yanındaki UYDU |
 | Onay | A | Enter | Ekrana dokun |
 | Yeniden dene | — | R | — |
 
-Her dokunmatik tuşun altında karşılık gelen klavye tuşu yazılıdır — ◀ (A), ▶ (D), ▲ (W), FÜZE (X), UYDU (C) — böylece yönergeleri okumadan da hangi tuşun ne yaptığı görünür.
+Dokunmatikte kontroller Mobile Legends tarzıdır: **solda analog joystick** ile dönersin (ne kadar çekersen o kadar hızlı döner), **sağda büyük gaz tuşu** ve etrafında FÜZE / UYDU. Her tuşun altında karşılık gelen klavye tuşu yazılıdır — ▲ (W), FÜZE (X), UYDU (C).
 
 Kol bağlandığında ekran tuşları otomatik kaybolur.
 

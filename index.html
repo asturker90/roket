@@ -30,7 +30,7 @@
 
 /* ===================== EKRAN ===================== */
 const W = 1200, H = 800;
-const SURUM = "v1.9";
+const SURUM = "v2.0";
 document.title = `ROKET ${SURUM} — YOLCULUK`;
 const cvs = document.getElementById("c");
 const ctx = cvs.getContext("2d");
@@ -304,13 +304,21 @@ function dunyaBasla() {
 const dunyaBitir = () => ctx.restore();
 
 /* ===================== EKRAN TUSLARI ===================== */
+// Sag kume (Mobile Legends tarzi): buyuk gaz + etrafinda fuze/uydu. Donus artik soldaki joystick.
 const TUSLAR = [
-  { id:"sol",  x:105,   y:H-95,  r:52, etiket:"\u25C0",    tus:"A" },
-  { id:"sag",  x:225,   y:H-95,  r:52, etiket:"\u25B6",    tus:"D" },
-  { id:"uydu", x:W-360, y:H-95,  r:44, etiket:"UYDU", tus:"C" },
-  { id:"ates", x:W-235, y:H-95,  r:48, etiket:"FUZE", tus:"X" },
-  { id:"itki", x:W-105, y:H-100, r:60, etiket:"\u25B2",    tus:"W" }
+  { id:"uydu", x:W-140, y:H-270, r:42, etiket:"UYDU", tus:"C" },
+  { id:"ates", x:W-260, y:H-175, r:50, etiket:"FUZE", tus:"X" },
+  { id:"itki", x:W-125, y:H-120, r:76, etiket:"\u25B2",    tus:"W" }
 ];
+// Soldaki analog joystick (donus)
+const JX = 155, JY = H-135, JR = 78, JKNOB = 34;
+let joyId = null, joyPos = { x:JX, y:JY };
+function joyGuncelle(l) {
+  let dx = l.x-JX, dy = l.y-JY; const d = Math.hypot(dx, dy);
+  if (d > JR) { dx = dx/d*JR; dy = dy/d*JR; }
+  joyPos = { x:JX+dx, y:JY+dy };
+}
+const joyBolgesinde = l => Math.hypot(l.x-JX, l.y-JY) < JR*1.9;
 
 /* ===================== GIRDI ===================== */
 const kb = { sol:false, sag:false, itki:false, ates:false };
@@ -355,13 +363,20 @@ cvs.addEventListener("pointerdown", e => {
   const l = yerel(e.clientX, e.clientY);
   isaretler.set(e.pointerId, l);
   if (durum === "dukkan") { dukkanDokun(l); return; }
-  if (durum === "ucus" && tusBul(l) === "uydu") { uyduBirak(); return; }
-  if (durum !== "ucus") onayla();
+  if (durum === "ucus") {
+    if (!kolBagli && joyId === null && joyBolgesinde(l)) { joyId = e.pointerId; joyGuncelle(l); return; }
+    if (!kolBagli && tusBul(l) === "uydu") { uyduBirak(); return; }
+    return;
+  }
+  onayla();
 });
 cvs.addEventListener("pointermove", e => {
-  if (isaretler.has(e.pointerId)) isaretler.set(e.pointerId, yerel(e.clientX, e.clientY));
+  if (!isaretler.has(e.pointerId)) return;
+  const l = yerel(e.clientX, e.clientY);
+  isaretler.set(e.pointerId, l);
+  if (e.pointerId === joyId) joyGuncelle(l);
 });
-const birak = e => isaretler.delete(e.pointerId);
+const birak = e => { isaretler.delete(e.pointerId); if (e.pointerId === joyId) joyId = null; };
 cvs.addEventListener("pointerup", birak);
 cvs.addEventListener("pointercancel", birak);
 cvs.addEventListener("pointerleave", birak);
@@ -548,8 +563,12 @@ function guncelle(dt) {
   girdi.sag  = kb.sag  || pad.sag;
   girdi.itki = kb.itki || pad.itki;
   girdi.ates = kb.ates || pad.ates;
+  let joyX = 0;   // analog donus (-1..1) soldaki joystickten
+  if (!kolBagli && joyId !== null) joyX = Math.max(-1, Math.min(1, (joyPos.x-JX)/JR));
   if (isaretler.size && !kolBagli)
-    for (const l of isaretler.values()) { const t = tusBul(l); if (t) girdi[t] = true; }
+    for (const [id, l] of isaretler) { if (id === joyId) continue; const t = tusBul(l); if (t) girdi[t] = true; }
+  girdi.don = (girdi.sag ? 1 : 0) - (girdi.sol ? 1 : 0) + joyX;   // klavye/kol + joystick birlesik
+  girdi.don = Math.max(-1, Math.min(1, girdi.don));
 
   if (sarsinti > 0) sarsinti = Math.max(0, sarsinti - dt*26);
   if (durum === "ucus") sure += dt;
@@ -657,8 +676,7 @@ function guncelle(dt) {
     sarsinti = Math.max(sarsinti, 5);
   }
 
-  if (girdi.sol) roket.aci -= donusHizi()*dt;
-  if (girdi.sag) roket.aci += donusHizi()*dt;
+  if (girdi.don) roket.aci += donusHizi()*girdi.don*dt;
 
   roket.itki = girdi.itki && yakit > 0;
   if (roket.itki) {
@@ -1041,10 +1059,33 @@ function uyduCiz(x, y) {   // birakilmis kontrol noktasi
   ctx.restore();
 }
 
+function joystickCiz() {
+  if (kolBagli) return;
+  ctx.shadowBlur = 0;
+  const aktif = joyId !== null;
+  // dis halka
+  ctx.fillStyle = "rgba(255,255,255,0.05)";
+  ctx.beginPath(); ctx.arc(JX, JY, JR, 0, 6.2832); ctx.fill();
+  ctx.strokeStyle = aktif ? "rgba(255,255,255,0.4)" : "rgba(255,255,255,0.22)";
+  ctx.lineWidth = 1.6; ctx.beginPath(); ctx.arc(JX, JY, JR, 0, 6.2832); ctx.stroke();
+  // sol/sag ipucu okları
+  ctx.fillStyle = "rgba(255,255,255,0.35)"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.font = "18px ui-monospace, monospace";
+  ctx.fillText("◀", JX-JR+16, JY); ctx.fillText("▶", JX+JR-16, JY);
+  ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+  // ic topuz
+  const kx = aktif ? joyPos.x : JX, ky = aktif ? joyPos.y : JY;
+  ctx.fillStyle = aktif ? "rgba(255,255,255,0.28)" : "rgba(255,255,255,0.13)";
+  ctx.beginPath(); ctx.arc(kx, ky, JKNOB, 0, 6.2832); ctx.fill();
+  ctx.strokeStyle = aktif ? "rgba(255,255,255,0.75)" : "rgba(255,255,255,0.4)";
+  ctx.lineWidth = 1.6; ctx.beginPath(); ctx.arc(kx, ky, JKNOB, 0, 6.2832); ctx.stroke();
+}
+
 function ekranTuslariCiz() {
   if (kolBagli) return;
+  joystickCiz();
   const basili = new Set();
-  for (const l of isaretler.values()) { const t = tusBul(l); if (t) basili.add(t); }
+  for (const [id, l] of isaretler) { if (id === joyId) continue; const t = tusBul(l); if (t) basili.add(t); }
   for (const t of TUSLAR) {
     const on = basili.has(t.id);
     const pasif = (t.id === "ates" && fuzeSayi <= 0) || (t.id === "uydu" && uyduSayi <= 0);
@@ -1206,8 +1247,8 @@ function arayuz() {
 
   if (durum === "hazir") {
     const s = ["Mavi gezegenden kalk, yesil gezegene in. Her inis bir sonrakinin kalkis noktasi.",
-               "Klavye: OK tuslari = don/itki  ·  X = FUZE AT  ·  Kol: A itki, B fuze",
-               "Dokunmatik: alttaki tuslar  ·  Fuze icin once TERSANE'den FUZE RAMPASI al"];
+               "Dokunmatik: SOL joystick = don  ·  SAG buyuk tus = gaz  ·  etrafinda FUZE / UYDU",
+               "Klavye: OK/A D = don  ·  W/Yukari = gaz  ·  X = fuze  ·  C = uydu  ·  Kol: A gaz, B fuze"];
     if (kapsuller.length)    s.push("Kapsulleri topla — F: +yakit, $: +kredi");
     if (karaDelikler.length) s.push("Kara delige dikkat: cekimi guclu, olay ufku olduruyor");
     if (gezegenler.some(g=>g.kurtarma)) s.push("Sari gezegende mahsur mekik var — duzgun in, yakit ver, kurtar, bol para al");
