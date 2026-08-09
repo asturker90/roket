@@ -30,7 +30,7 @@
 
 /* ===================== EKRAN ===================== */
 const W = 1200, H = 800;
-const SURUM = "v2.1";
+const SURUM = "v2.2";
 document.title = `ROKET ${SURUM} — YOLCULUK`;
 const cvs = document.getElementById("c");
 const ctx = cvs.getContext("2d");
@@ -54,12 +54,12 @@ const TEMEL = { yakit:110, itki:230, donme:3.0, inHiz:62, inAci:0.60, tuketim:26
 const GRAV = 5600;
 
 const YUKSELTMELER = [
-  { id:"tank",  ad:"YAKIT TANKI",  aciklama:"+35 kapasite",                  max:5, fiyat:l=>150+l*95 },
-  { id:"itki",  ad:"MOTOR",        aciklama:"+14% itki, +20% yakit tuketimi",max:4, fiyat:l=>170+l*115 },
-  { id:"jiro",  ad:"JIROSKOP",     aciklama:"+14% donus hizi",               max:3, fiyat:l=>130+l*80 },
-  { id:"ayak",  ad:"INIS TAKIMI",  aciklama:"Daha toleransli inis",          max:3, fiyat:l=>180+l*120 },
-  { id:"fuze",  ad:"FUZE RAMPASI", aciklama:"+2 fuze kapasitesi, dolu gelir",max:3, fiyat:l=>260+l*170 },
-  { id:"kalkan",ad:"KALKAN",       aciklama:"Her sicrama +1 yuk; carpmayi emer",max:3, fiyat:l=>220+l*150 }
+  { id:"tank",  ad:"YAKIT TANKI",  aciklama:"+35 kapasite",                  max:10, fiyat:l=>150+l*95 },
+  { id:"itki",  ad:"MOTOR",        aciklama:"+14% itki, +20% yakit tuketimi",max:5, fiyat:l=>170+l*115 },
+  { id:"jiro",  ad:"JIROSKOP",     aciklama:"+14% donus hizi",               max:5, fiyat:l=>130+l*80 },
+  { id:"ayak",  ad:"INIS TAKIMI",  aciklama:"Daha toleransli inis",          max:5, fiyat:l=>180+l*120 },
+  { id:"fuze",  ad:"FUZE RAMPASI", aciklama:"+2 fuze kapasitesi, dolu gelir",max:5, fiyat:l=>260+l*170 },
+  { id:"kalkan",ad:"KALKAN",       aciklama:"Her sicrama +1 yuk; carpmayi emer",max:5, fiyat:l=>220+l*150 }
 ];
 let seviye = { tank:0, itki:0, jiro:0, ayak:0, fuze:0, kalkan:0 };
 
@@ -81,7 +81,7 @@ const SARFLAR = [
   { ad:"FUZE IKMALI",  aciklama:"+1 fuze",   fiyat:()=>90,
     uygun:()=> seviye.fuze>0 && fuzeSayi<fuzeKap(), uygula:()=>{ fuzeSayi = Math.min(fuzeKap(), fuzeSayi+1); } },
   { ad:"UYDU", aciklama:"+1 kontrol noktasi; ucarken birak, olursen oradan basla", fiyat:()=>130,
-    uygun:()=> uyduSayi < 3, uygula:()=>{ uyduSayi++; } }
+    uygun:()=> uyduSayi < 5, uygula:()=>{ uyduSayi++; } }
 ];
 
 /* ===================== DUNYA ===================== */
@@ -455,27 +455,41 @@ function devamEt() {
 }
 let sonInisId = null;
 
-function satirSec(i) {
-  if (i < YUKSELTMELER.length) {
-    const u = YUKSELTMELER[i], lv = seviye[u.id];
+// Tersane satirlari: once sarf malzemeler (ikmaller ustte), sonra yukseltmeler, en altta devam
+function dukkanSatirlari() {
+  const r = [];
+  for (let i = 0; i < SARFLAR.length; i++) r.push({ tur:"sarf", i });
+  for (let i = 0; i < YUKSELTMELER.length; i++) r.push({ tur:"yuk", i });
+  r.push({ tur:"devam" });
+  return r;
+}
+function dukkanY(idx, n) {   // sarf grubu | yukseltme grubu (bosluk) | devam (bosluk)
+  return 232 + idx*54 + (idx >= SARFLAR.length ? 14 : 0) + (idx === n-1 ? 14 : 0);
+}
+function satirSec(sel) {
+  const row = dukkanSatirlari()[sel];
+  if (!row) return;
+  if (row.tur === "devam") { devamEt(); return; }
+  if (row.tur === "yuk") {
+    const u = YUKSELTMELER[row.i], lv = seviye[u.id];
     if (lv >= u.max) return;
     const f = u.fiyat(lv);
     if (para < f) return;
     para -= f; seviye[u.id] = lv+1;
     if (u.id === "fuze")   fuzeSayi = fuzeKap();
     if (u.id === "kalkan") kalkan = kalkanKap();
-  } else if (i < YUKSELTMELER.length + SARFLAR.length) {
-    const s = SARFLAR[i-YUKSELTMELER.length];
+  } else {   // sarf
+    const s = SARFLAR[row.i];
     if (!s.uygun()) return;
     const f = s.fiyat();
     if (para < f) return;
     para -= f; s.uygula();
-  } else devamEt();
+  }
 }
 function dukkanDokun(l) {
-  const y0 = 236, sy = 56, n = satirSayisi();
+  const n = satirSayisi();
   for (let i = 0; i < n; i++) {
-    const y = y0 + i*sy + (i >= YUKSELTMELER.length ? 16 : 0) + (i === n-1 ? 16 : 0);
+    const y = dukkanY(i, n);
     if (l.y > y-24 && l.y < y+24 && l.x > 190 && l.x < 1010) { dukkanSecim = i; satirSec(i); return; }
   }
 }
@@ -1223,7 +1237,8 @@ function arayuz() {
   ctx.fillText(`${etap}. SICRAMA`, 20, 30);
   ctx.fillText(`DENEME ${toplamDeneme}`, 20, 50);
   let yy = 74;
-  ctx.fillStyle = "#f5d97c"; ctx.fillText(`${para} KREDI`, 20, yy); yy += 22;
+  altinCiz(20, yy, `${para} KREDI`, "13px ui-monospace, monospace"); yy += 22;
+  ctx.font = "13px ui-monospace, monospace";
   if (seviye.fuze > 0)   { ctx.fillStyle = "#ff9a4d"; ctx.fillText(`FUZE ${fuzeSayi}/${fuzeKap()}`, 20, yy); yy += 22; }
   if (seviye.kalkan > 0) { ctx.fillStyle = "#5cc8ff"; ctx.fillText(`KALKAN ${kalkan}/${kalkanKap()}`, 20, yy); yy += 22; }
   if (uyduSayi > 0 || uyduKonum) {
@@ -1235,10 +1250,9 @@ function arayuz() {
     ctx.fillText(`HEDEFE ${Math.round(Math.hypot(roket.x-h.x, roket.y-h.y) - h.r)} m`, 20, yy);
   }
 
-  ctx.fillStyle = "#6a6a6a"; ctx.fillText("YAKIT", W-196, 30);
-  ctx.strokeStyle = "#6a6a6a"; ctx.lineWidth = 1; ctx.strokeRect(W-134, 20, 114, 11);
-  ctx.fillStyle = yakit < kapasite()*0.25 ? "#ff5c4d" : "#fff";
-  ctx.fillRect(W-133, 21, 112*(yakit/kapasite()), 9);
+  ctx.font = "13px ui-monospace, monospace"; ctx.textAlign = "left";
+  ctx.fillStyle = "#6a6a6a"; ctx.fillText("YAKIT", W-200, 30);
+  pilCiz(W-140, 19, 118, 13, yakit/kapasite(), yakit < kapasite()*0.25 ? "#ff5c4d" : "#7cf5c0");   // pil stili
   ctx.textAlign = "right"; ctx.fillStyle = "#5a5a5a"; ctx.font = "11px ui-monospace, monospace";
   ctx.fillText(`${yakit.toFixed(0)} / ${kapasite()}   -${tuketim().toFixed(0)}/sn`, W-20, 46);
   ctx.font = "13px ui-monospace, monospace";
@@ -1301,58 +1315,88 @@ function kutu(baslik, satirlar, alt, renk) {
   ctx.textAlign = "left";
 }
 
+function altinCiz(x, yb, metin, font) {   // altin coin + tutar (sol hizali)
+  ctx.save(); ctx.shadowBlur = 0;
+  const r = 6, cx = x+r, cy = yb-4;
+  ctx.fillStyle = "#f5c44d"; ctx.beginPath(); ctx.arc(cx, cy, r, 0, 6.2832); ctx.fill();
+  ctx.strokeStyle = "rgba(120,90,30,0.9)"; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.arc(cx, cy, r, 0, 6.2832); ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx, cy, r-2.5, 0, 6.2832); ctx.stroke();
+  ctx.font = font || "13px ui-monospace, monospace"; ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+  ctx.fillStyle = "#f5d97c"; ctx.fillText(metin, x+2*r+6, yb);
+  ctx.restore();
+}
+function pilCiz(x, y, w, h, oran, renk) {   // yatay pil/yakit bari (sagda ucu)
+  ctx.save(); ctx.shadowBlur = 0;
+  ctx.strokeStyle = "rgba(255,255,255,0.5)"; ctx.lineWidth = 1; ctx.strokeRect(x, y, w, h);
+  ctx.fillStyle = "rgba(255,255,255,0.55)"; ctx.fillRect(x+w+1.5, y+h*0.28, 3, h*0.44);   // pil ucu
+  ctx.fillStyle = renk; ctx.fillRect(x+1.5, y+1.5, Math.max(0, w-3)*Math.max(0, Math.min(1, oran)), h-3);
+  ctx.restore();
+}
+
 function dukkanCiz() {
   ctx.textAlign = "center";
   ctx.shadowColor = "#f5d97c"; ctx.shadowBlur = 16; ctx.fillStyle = "#f5d97c";
-  ctx.font = "700 36px ui-monospace, monospace"; ctx.fillText("TERSANE", W/2, 104);
+  ctx.font = "700 34px ui-monospace, monospace"; ctx.fillText("TERSANE", W/2, 96);
   ctx.shadowBlur = 0;
   ctx.font = "12px ui-monospace, monospace"; ctx.fillStyle = "rgba(245,217,124,0.6)";
-  ctx.fillText(`ROKET ${SURUM}`, W/2, 62);
-  ctx.font = "16px ui-monospace, monospace"; ctx.fillStyle = "#fff";
-  ctx.fillText(`${para} KREDI   ·   YAKIT ${yakit.toFixed(0)}/${kapasite()}` +
-    (seviye.fuze ? `   ·   FUZE ${fuzeSayi}/${fuzeKap()}` : ""), W/2, 140);
-  ctx.font = "12px ui-monospace, monospace"; ctx.fillStyle = "#6a6a6a";
-  ctx.fillText("Yukari/Asagi sec · Enter veya A ile al · dokunmatikte satira dokun", W/2, 166);
+  ctx.fillText(`ROKET ${SURUM}`, W/2, 58);
 
-  const y0 = 236, sy = 56, n = satirSayisi();
+  // ust bilgi seridi: altin (coin) + yakit pili + fuze
+  const yb = 138;
+  altinCiz(W/2 - 280, yb, `${para} KREDI`, "16px ui-monospace, monospace");
+  ctx.textAlign = "left"; ctx.font = "14px ui-monospace, monospace"; ctx.fillStyle = "#8a8a8a";
+  ctx.fillText("YAKIT", W/2 - 40, yb);
+  pilCiz(W/2 + 24, yb-13, 130, 15, yakit/kapasite(), yakit < kapasite()*0.25 ? "#ff5c4d" : "#7cf5c0");
+  ctx.fillStyle = "#cfcfcf"; ctx.fillText(`${yakit.toFixed(0)}/${kapasite()}`, W/2 + 164, yb);
+  if (seviye.fuze) { ctx.fillStyle = "#ff9a4d"; ctx.fillText(`FUZE ${fuzeSayi}/${fuzeKap()}`, W/2 + 270, yb); }
+
+  ctx.textAlign = "center"; ctx.font = "12px ui-monospace, monospace"; ctx.fillStyle = "#6a6a6a";
+  ctx.fillText("Yukari/Asagi sec · Enter veya A ile al · dokunmatikte satira dokun", W/2, 168);
+
+  const rows = dukkanSatirlari(), n = rows.length;
   ctx.textAlign = "left";
-  for (let i = 0; i < n; i++) {
-    const y = y0 + i*sy + (i >= YUKSELTMELER.length ? 16 : 0) + (i === n-1 ? 16 : 0);
-    const secili = dukkanSecim === i;
-    if (i === n-1) {
-      if (secili) {
-        ctx.fillStyle = "rgba(124,245,192,0.1)"; ctx.fillRect(200, y-24, 800, 48);
-        ctx.strokeStyle = "rgba(124,245,192,0.5)"; ctx.lineWidth = 1; ctx.strokeRect(200, y-24, 800, 48);
-      }
+  for (let idx = 0; idx < n; idx++) {
+    const row = rows[idx], y = dukkanY(idx, n), secili = dukkanSecim === idx;
+    if (row.tur === "devam") {
+      if (secili) { ctx.fillStyle = "rgba(124,245,192,0.1)"; ctx.fillRect(200, y-24, 800, 48);
+        ctx.strokeStyle = "rgba(124,245,192,0.5)"; ctx.lineWidth = 1; ctx.strokeRect(200, y-24, 800, 48); }
       ctx.textAlign = "center"; ctx.font = "17px ui-monospace, monospace"; ctx.fillStyle = "#7cf5c0";
-      ctx.fillText(`${etap+1}. SICRAMAYA DEVAM`, W/2, y+5);
-      ctx.textAlign = "left"; continue;
+      ctx.fillText(`${etap+1}. SICRAMAYA DEVAM`, W/2, y+5); ctx.textAlign = "left"; continue;
     }
-    let ad, ack, fiyatMetni, alinabilir, doluMu = false, lv = 0, mx = 0;
-    if (i < YUKSELTMELER.length) {
-      const u = YUKSELTMELER[i]; lv = seviye[u.id]; mx = u.max; doluMu = lv >= mx;
+    let ad, ack, fiyatMetni, alinabilir, doluMu = false, lv = 0, mx = 0, sarfMi = false;
+    if (row.tur === "yuk") {
+      const u = YUKSELTMELER[row.i]; lv = seviye[u.id]; mx = u.max; doluMu = lv >= mx;
       ad = u.ad; ack = u.aciklama;
       const f = doluMu ? 0 : u.fiyat(lv);
       fiyatMetni = doluMu ? "TAM" : `${f}`; alinabilir = !doluMu && para >= f;
     } else {
-      const s = SARFLAR[i-YUKSELTMELER.length];
+      const s = SARFLAR[row.i]; sarfMi = true;
       ad = s.ad; ack = s.aciklama;
       const uygun = s.uygun(), f = s.fiyat();
-      fiyatMetni = uygun ? `${f}` : "GEREK YOK";
-      alinabilir = uygun && para >= f; doluMu = !uygun;
+      fiyatMetni = uygun ? `${f}` : "GEREK YOK"; alinabilir = uygun && para >= f; doluMu = !uygun;
     }
     if (secili) {
-      ctx.fillStyle = "rgba(245,217,124,0.08)"; ctx.fillRect(200, y-24, 800, 48);
-      ctx.strokeStyle = "rgba(245,217,124,0.5)"; ctx.lineWidth = 1; ctx.strokeRect(200, y-24, 800, 48);
+      const rk = sarfMi ? "124,245,192" : "245,217,124";
+      ctx.fillStyle = `rgba(${rk},0.08)`; ctx.fillRect(200, y-24, 800, 48);
+      ctx.strokeStyle = `rgba(${rk},0.5)`; ctx.lineWidth = 1; ctx.strokeRect(200, y-24, 800, 48);
     }
     ctx.font = "16px ui-monospace, monospace";
     ctx.fillStyle = doluMu ? "#4a4a4a" : (alinabilir ? "#fff" : "#6a6a6a");
     ctx.fillText(ad, 224, y-2);
     ctx.font = "12px ui-monospace, monospace"; ctx.fillStyle = "#6a6a6a";
     ctx.fillText(ack, 224, y+16);
-    if (mx) for (let k = 0; k < mx; k++) {
-      ctx.fillStyle = k < lv ? "#7cf5c0" : "#2e2e2e";
-      ctx.fillRect(700+k*18, y-12, 12, 12);
+    // yukseltme pip'leri (10'a kadar sigar)
+    if (mx) {
+      const ps = Math.min(18, 176/mx), pw = Math.min(12, ps-3);
+      for (let k = 0; k < mx; k++) { ctx.fillStyle = k < lv ? "#7cf5c0" : "#2e2e2e";
+        ctx.fillRect(686+k*ps, y-11, pw, 11); }
+    }
+    // yakit ikmali satirinda dolan yakit bari (sayi da var)
+    if (sarfMi && SARFLAR[row.i].ad === "YAKIT IKMALI") {
+      pilCiz(686, y-11, 150, 13, yakit/kapasite(), yakit < kapasite()*0.25 ? "#ff5c4d" : "#7cf5c0");
+      ctx.textAlign = "left"; ctx.font = "11px ui-monospace, monospace"; ctx.fillStyle = "#8a8a8a";
+      ctx.fillText(`${yakit.toFixed(0)}/${kapasite()}`, 686, y+16);
     }
     ctx.textAlign = "right"; ctx.font = "15px ui-monospace, monospace";
     ctx.fillStyle = doluMu ? "#4a4a4a" : (alinabilir ? "#f5d97c" : "#5a4a2a");

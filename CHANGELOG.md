@@ -3,6 +3,21 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada tutulur.
 Sürümleme kabaca [SemVer](https://semver.org/lang/tr/) mantığını izler.
 
+## [v2.2] — 2026-08-07
+
+### Değiştirildi (Tersane elden geçirildi)
+- **Sarf malzemeleri (yakıt/füze/uydu ikmali) listenin en üstüne** taşındı; artık her
+  seferinde en alta inmeye gerek yok. Sıra: ikmaller → yükseltmeler → devam.
+- **Yükseltme seviyeleri artırıldı**: hepsi 5'e (motor/jiroskop/iniş takımı/füze/kalkan);
+  **yakıt tankı 10'a**. Uydu taşıma kapasitesi 5. Seviye göstergesi (pip) 10'a kadar sığar.
+- **Yakıt göstergesi pil stiline** çevrildi (yatay dolan bar + uç). Tersanede üst şeritte
+  ve YAKIT IKMALI satırında bar + sayı birlikte; HUD'da da pil barı.
+- **Kredi yanına altın-coin** simgesi eklendi (tersane şeridi ve HUD).
+
+### İç yapı
+- Tersane satırları birleşik model (`dukkanSatirlari()`/`dukkanY()`) ile yeniden yazıldı;
+  sıralama ve yerleşim tek yerden yönetiliyor.
+
 ## [v2.1] — 2026-08-07
 
 ### Değiştirildi (bölüm/zorluk yapısı — Aşama 1)
