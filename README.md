@@ -1,6 +1,6 @@
 # ROKET
 
-**Sürüm: v2.2** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md).
+**Sürüm: v2.3** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md).
 
 Yerçekimi tabanlı bir uzay yolculuğu oyunu. Tek HTML dosyası, bağımlılık yok, çevrimdışı çalışır.
 
@@ -82,11 +82,15 @@ Her inişten sonra açılır. En sık kullanılan **sarf malzemeleri (yakıt/fü
 
 Yükseltmelerin hepsi 5 seviyeye çıkar; **yakıt tankı ise 10 seviyeye** kadar. **Motor** itkiyi %14 artırır ama yakıt tüketimini %20 artırır — net kazanç değil, bir tercih. **Füze rampası** kapasiteyi 2 artırır ve dolu gelir. **Kalkan** her seviyede bir yük ekler; her sıçrama başında dolar ve bir göktaşı ya da kara delik çarpmasını emerek seni kurtarır (kara delikte acil fırlatma yapar). İniş hatalarını engellemez — beceri hâlâ sende.
 
-## Uydu (kontrol noktası)
+## Ölüm ve strateji
 
-Ölünce oyun sıfırlanmaz — o sıçramanın başına dönersin, paran ve yükseltmelerin durur. Uzun sıçramalarda baştan başlamak yorucu olabilir; **uydu** bunun için var.
+**Ölürsen en baştan başlarsın.** Roketin patlarsa oyun tamamen sıfırlanır: **1. bölüm, sıfır kredi, sıfır yükseltme.** Bu yüzden her sıçrama önemlidir — yakıt yönetimi, doğru açı, ne zaman risk alacağın hepsi sayar. Tek istisna: aşağıdaki **uydu**.
 
-Tersane'den satın aldığın bir sarf malzemesidir (en fazla 3 taşırsın). Uçarken istediğin anda bir tuşla bırakırsın; o anki durum kaydedilir. **Ölürsen sıçramanın başına değil, uydunun olduğu yerden devam edersin.** Zor bir geçitten hemen önce bırakmak en mantıklısı. Bıraktığın uydu o sıçrama boyunca geçerlidir; başarıyla inince ya da **BAŞTAN** dersen iptal olur.
+Ekrandaki **BAŞTAN** tuşu da oyunu bilerek en baştan başlatır (sıçrama tekrarı değildir).
+
+## Uydu (kontrol noktası — tek can simidin)
+
+Ölünce baştan başladığın için **uydu** senin tek sigortandır. Tersane'den satın aldığın bir sarf malzemesidir (en fazla 5 taşırsın). Uçarken istediğin anda bir tuşla bırakırsın; o anki durum kaydedilir. **Ölürsen en baştan değil, uydunun olduğu yerden devam edersin** — paran ve yükseltmelerin korunur. Zor bir geçitten (kara delik, UFO) hemen önce bırakmak en mantıklısı. Bıraktığın uydu o sıçrama boyunca geçerlidir; başarıyla inince (yeni sıçrama) ya da **BAŞTAN** dersen iptal olur.
 
 ## Kontroller
 

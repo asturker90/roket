@@ -30,7 +30,7 @@
 
 /* ===================== EKRAN ===================== */
 const W = 1200, H = 800;
-const SURUM = "v2.2";
+const SURUM = "v2.3";
 document.title = `ROKET ${SURUM} — YOLCULUK`;
 const cvs = document.getElementById("c");
 const ctx = cvs.getContext("2d");
@@ -241,10 +241,12 @@ function anlikGeriYukle(k, uyduMu) {
   } else { sure = 0; durum = "hazir"; }
 }
 function anlikYukle() { anlikGeriYukle(kayit, false); }
-function diril() {   // olunce cagirilir — uydu varsa oradan, yoksa etap basindan
+function diril() {   // olunce cagirilir — uydu varsa oradan devam, YOKSA en bastan (1. bolum)
   toplamDeneme++;
-  if (uyduKayit) anlikGeriYukle(uyduKayit, true);
-  else anlikYukle();
+  if (uyduKayit) { anlikGeriYukle(uyduKayit, true); return; }
+  const deneme = toplamDeneme;
+  yenidenBasla();          // her sey sifirlanir: para, yukseltmeler, bolum -> dikkat & strateji onemli
+  toplamDeneme = deneme;   // toplam deneme (olum) sayaci korunur
 }
 function uyduBirak() {   // ucarken kontrol noktasi birak (sarf malzeme)
   if (durum !== "ucus" || !roket.canli || uyduSayi <= 0) return;
@@ -401,8 +403,8 @@ document.getElementById("btnTam").addEventListener("click", () => {
   }
 });
 document.getElementById("btnYeni").addEventListener("click", () => {
-  // BASTAN: sicramanin en basina don, birakilan uyduyu da iptal et
-  if (durum !== "dukkan") { toplamDeneme++; uyduKayit = null; uyduKonum = null; anlikYukle(); }
+  // BASTAN: oyunu tamamen sifirla, 1. bolumden basla (dukkanda calismaz)
+  if (durum !== "dukkan") yenidenBasla();
 });
 
 let kolGecmis = { a:false, b:false, yukari:false, asagi:false, start:false, y:false };
@@ -1281,7 +1283,8 @@ function arayuz() {
     if (bedavaIkmal)         s.push("Acil yakit ikmali yapildi (45)");
     kutu(etap === 1 ? "YOLCULUK BASLIYOR" : `${etap}. SICRAMA — ${blokAdi()}`, s, "DOKUN / ENTER");
   } else if (durum === "patladi") {
-    kutu(mesaj, [`Sure ${sure.toFixed(1)} sn`, uyduKayit ? "Birakilan uyduya donuluyor" : "Sicrama basina donuluyor"],
+    kutu(mesaj, [`Sure ${sure.toFixed(1)} sn`,
+         uyduKayit ? "Birakilan uyduya donuluyor" : "UYDU yok — EN BASTAN basliyorsun (1. bolum, sifir para)"],
          "TEKRAR ICIN DOKUN", "#ff5c4d");
   } else if (durum === "indi") {
     kutu(mesaj, [
