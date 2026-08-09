@@ -3,6 +3,17 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada tutulur.
 Sürümleme kabaca [SemVer](https://semver.org/lang/tr/) mantığını izler.
 
+## [v2.0] — 2026-08-07
+
+### Değiştirildi (dokunmatik kontrol elden geçirildi)
+- **Sol analog joystick**: Ayrı sol/sağ butonları kaldırıldı; yerine Mobile Legends
+  tarzı çember-içi-topuz joystick geldi. Yatay çekme miktarı dönüşü **analog** kontrol
+  eder (ne kadar çekersen o kadar hızlı döner). Klavye ve kol dönüşü de aynı birleşik
+  `girdi.don` değerine bağlandı.
+- **Sağ küme (MOBA düzeni)**: Gaz (itki) tuşu büyütüldü ve sağ alta alındı; FÜZE ve
+  UYDU tuşları onun etrafına yerleştirildi.
+- Çoklu dokunma korunur: bir parmakla dönerken diğeriyle gaz/füze verilebilir.
+
 ## [v1.9] — 2026-08-07
 
 ### Eklendi
