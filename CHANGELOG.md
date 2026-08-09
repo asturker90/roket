@@ -3,6 +3,19 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada tutulur.
 Sürümleme kabaca [SemVer](https://semver.org/lang/tr/) mantığını izler.
 
+## [v2.8] — 2026-08-09
+
+### Eklendi (2 kişilik keşfedilebilirlik)
+- Ekranda tıklanır **"👥 2 KİŞİLİK" butonu** — artık başlatmak için klavyeyi bilmek gerekmiyor
+  (dokunmatik/fare ile de başlar). "2" tuşu da çalışmaya devam ediyor.
+- **2P hazırlık ekranı**: mod başlarken her iki oyuncunun kontrolleri büyükçe gösterilir
+  (P1 ← → ↑ + Sağ Shift + `.` uydu · P2 A D W + Sol Shift + `Q` uydu), ayrıca kurallar ve
+  "klavye/gamepad gerekir" notu. Dokun ya da Enter ile başlanır.
+- Kazanan ekranından dokunarak tekrar başlanabiliyor.
+
+### Değiştirildi
+- 2P bölüm/tema yazısı alta taşındı (üstteki butonlarla çakışmasın).
+
 ## [v2.7] — 2026-08-09
 
 ### Eklendi (2 kişilik derinlik)
