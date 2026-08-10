@@ -50,7 +50,7 @@
 
 /* ===================== EKRAN ===================== */
 const W = 1200, H = 800;
-const SURUM = "v2.9";
+const SURUM = "v3.0";
 document.title = `ROKET ${SURUM} — YOLCULUK`;
 const cvs = document.getElementById("c");
 const ctx = cvs.getContext("2d");
@@ -864,17 +864,20 @@ function guncelle(dt) {
         return;
       }
 
-      /* Kurtarma gezegeni: yuzeyde dur, duzgun konumdaysan mekige yakit aktar */
+      /* Kurtarma gezegeni: yesil hedef kadar kolay — temas edince tutar, diklestirir, yakit akar */
       if (p.kurtarma) {
-        if (hiz >= inisHizi()*1.5) { bitir(false, "COK HIZLI"); return; }  // sert carpma = olum
+        if (hiz >= inisHizi()*1.5) { bitir(false, "COK HIZLI"); return; }  // sadece sert carpma olduruyor
         roket.x = p.x + nx*(p.r+AYAK_BOY);
         roket.y = p.y + ny*(p.r+AYAK_BOY);
         const vn = (roket.vx-p.vx)*nx + (roket.vy-p.vy)*ny;
         if (vn < 0) { roket.vx -= vn*nx; roket.vy -= vn*ny; }
         roket.vx += (p.vx-roket.vx)*0.25; roket.vy += (p.vy-roket.vy)*0.25;
         roket.ayak = 1;
-        if (!p.mekik.gitti && hiz < inisHizi() && fark < inisAcisi()) {   // duzgun konum: aktar
-          const ver = Math.min(30*dt, p.mekik.kap - p.mekik.yakit, Math.max(0, yakit - 15));
+        // otomatik diklestir: oyuncu acisini elle tutmak zorunda kalmasin (yesil gibi kolay)
+        const dAci = ((nAci-roket.aci+Math.PI*3)%(Math.PI*2))-Math.PI;
+        roket.aci += dAci * Math.min(1, dt*8);
+        if (!p.mekik.gitti && hiz < inisHizi()*1.2) {   // yavassan aktar (aci artik otomatik dikleniyor)
+          const ver = Math.min(45*dt, p.mekik.kap - p.mekik.yakit, Math.max(0, yakit - 15));
           yakit -= ver; p.mekik.yakit += ver;
           if (p.mekik.yakit >= p.mekik.kap - 0.4) mekikKurtar(p);
         }
@@ -998,10 +1001,10 @@ function gezegenCiz(p) {
     ctx.beginPath(); ctx.arc(cx, cy, k.r, k.a+Math.PI*0.5, k.a+Math.PI*1.5); ctx.stroke();
     ctx.restore();
   }
-  if (h) {
+  if (h || kr) {   // hedef ve kurtarma gezegeni: nabiz gibi genisleyen ince cember
     const nb = (performance.now()/900)%1;
-    ctx.shadowColor = "#7cf5c0"; ctx.shadowBlur = 10;
-    ctx.strokeStyle = "rgba(124,245,192,0.5)"; ctx.globalAlpha = 1-nb;
+    ctx.shadowColor = renk; ctx.shadowBlur = 10;
+    ctx.strokeStyle = h ? "rgba(124,245,192,0.5)" : "rgba(245,196,77,0.5)"; ctx.globalAlpha = 1-nb;
     ctx.beginPath(); ctx.arc(p.x, p.y, p.r+12+nb*26, 0, 6.2832); ctx.stroke();
     ctx.globalAlpha = 1;
   }
@@ -1694,7 +1697,7 @@ function guncelleIkili(dt) {
           bildirim = { metin:`${P_RENK[r.no].ad} INDI` + (kalan ? " — digerini bekliyor" : ""), omur:1.4 };
           bitti=true; break;
         }
-        if (p.baslangic && hiz < TEMEL.inHiz*1.5) {   // kalkis yuzeyinde dur
+        if ((p.baslangic || p.kurtarma) && hiz < TEMEL.inHiz*1.5) {   // kalkis/sari yuzeyinde yumusak dur (2P'de olumcul degil)
           r.x=p.x+nx*(p.r+AYAK_BOY); r.y=p.y+ny*(p.r+AYAK_BOY);
           const vn=(r.vx-p.vx)*nx+(r.vy-p.vy)*ny; if (vn<0){ r.vx-=vn*nx; r.vy-=vn*ny; }
           r.vx+=(p.vx-r.vx)*0.25; r.vy+=(p.vy-r.vy)*0.25; r.ayak=1; bitti=true; break;
