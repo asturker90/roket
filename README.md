@@ -8,7 +8,7 @@ Yerçekimiyle dans et, gezegenden gezegene in, **gidebildiğin kadar git**. Gök
 
 Tek HTML dosyası — bağımlılık yok, kurulum yok, çevrimdışı da çalışır.
 
-**Sürüm: v2.9** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md). · **Oyna:** https://asturker90.github.io/roket/ (her `main` güncellemesinde otomatik yayınlanır)
+**Sürüm: v3.0** — değişiklik geçmişi için [CHANGELOG.md](CHANGELOG.md). · **Oyna:** https://asturker90.github.io/roket/ (her `main` güncellemesinde otomatik yayınlanır)
 
 Bir gezegenden kalkıp bir sonrakine iniyorsun. İndiğin gezegen, bir sonraki sıçramanın kalkış noktası oluyor — bölümler ayrı sahneler değil, tek bir kesintisiz yolculuk.
 
@@ -69,8 +69,8 @@ Hedefe yaklaşınca bir rehber açılır ve düzgün inip inmediğini anında g�
 
 Bazı sıçramalarda yolun üstünde **sarı bir gezegen** çıkar; üzerinde sana benzeyen, **mahsur kalmış bir uzay mekiği** durur. İstersen uğramadan hedefe gidebilirsin — ama uğrarsan:
 
-1. Sarı gezegene **düzgün in** (yavaş + dik). Sert çarparsan ölürsün; nazikçe ama eğik değersen ölmezsin ama yakıt akmaz.
-2. Düzgün konumda beklerken **kendi yakıtından mekiğe akar** — senin yakıtın azalır, onun göstergesi dolar (kendine en az bir miktar yakıt ayrılır, mahsur kalmazsın).
+1. Sarı gezegene **yavaşça değ** — yeşil hedef kadar kolaydır. Temas edince gezegen seni tutar ve **otomatik dikleştirir**, açını elle tutmana gerek yok (sert çarparsan yine ölürsün).
+2. Yavaşça dururken **kendi yakıtından mekiğe akar** — senin yakıtın azalır, onun göstergesi dolar (kendine en az bir miktar yakıt ayrılır, mahsur kalmazsın).
 3. Mekik dolunca **kalkıp uzaklaşır** ve kurtulduğu için sana **bol miktarda kredi** bırakır.
 4. Sonra oradan kalkıp kendi hedefine devam edersin — yani tek durak değil, çift duraklı bir yolculuk.
 

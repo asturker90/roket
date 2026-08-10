@@ -3,6 +3,16 @@
 Bu projedeki tüm önemli değişiklikler bu dosyada tutulur.
 Sürümleme kabaca [SemVer](https://semver.org/lang/tr/) mantığını izler.
 
+## [v3.0] — 2026-08-09
+
+### Değiştirildi (kurtarma gezegeni cilası)
+- **Sarı (kurtarma) gezegenine iniş artık yeşil hedef kadar kolay**: temas edince roket
+  otomatik dikleşiyor (açıyı elle tutma derdi bitti) ve yakıt aktarımı daha geniş toleransla
+  başlıyor (hız < iniş hızı ×1.2), aktarım hızı da artırıldı. Sadece sert çarpma (×1.5) öldürür.
+- **Sarı gezegenin etrafına da nabız gibi genişleyen ince çember** eklendi (yeşildeki gibi,
+  kendi renginde) — daha havalı ve "burası özel durak" hissi.
+- 2P düzeltmesi: sarı gezegene temas artık ölümcül değil (yumuşak durak gibi davranır).
+
 ## [v2.9] — 2026-08-09
 
 ### Eklendi (duyuru/paylaşım hazırlığı)
